@@ -52,24 +52,27 @@ public interface CourseService {
 
 //    ResponseMessage downloadOwnAssignment(String studentId, long assignmentId);
 
+    //已选列表
     ResponseMessage electivedCourseList(String studentId);
 
-    ResponseMessage electiveList(String studentId);
+    ResponseMessage allPublishList(String studentId);
 
-    ResponseMessage getAssignmentGrade(String studentId,String assignmentId);
+    String getAssignmentGrade(String studentId, long assignmentId);
 
-    ResponseMessage getCourseGrade(String studentId,String publishId);
+    String getCourseGrade(String studentId, long publishId);
 
 
     /**
      * administrator part
      */
 
-    ResponseMessage approveCourse(String adminId, long courseId);
+    ResponseMessage approveCourse(long courseId);
 
-    ResponseMessage approvePublish(String adminId, long publishId);
+    ResponseMessage approvePublish(long publishId);
 
-    ResponseMessage cutOffElection(String adminId, long publishId);
+    ResponseMessage cutOffElection(long publishId);
 
+    ResponseMessage getToBeApproveCourse(long courseId);
 
+    ResponseMessage getToBeApprovePublish(long publishId);
 }

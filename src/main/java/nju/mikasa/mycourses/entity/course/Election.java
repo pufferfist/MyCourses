@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Election {
     @Id
     @GeneratedValue
@@ -27,4 +26,11 @@ public class Election {
     private User student;
 
     private boolean withdraw;
+
+    public Election(UndistributedElection undistributedElection){
+//        this.id=undistributedElection.getId();
+        this.publish=undistributedElection.getPublish();
+        this.student=undistributedElection.getStudent();
+        this.withdraw=false;
+    }
 }

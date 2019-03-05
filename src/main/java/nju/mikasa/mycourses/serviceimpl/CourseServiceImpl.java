@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -297,36 +298,68 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public ResponseMessage electivedCourseList(String studentId) {
         List<Election> electionList=electionRepository.findByStudent(new User(studentId));
-        return StatusMessage.getSuccess.setData(electionList);
+        ArrayList<Publish> publishList=new ArrayList<>();
+        for (Election e : electionList) {
+            publishList.add(e.getPublish());
+        }
+        return StatusMessage.getSuccess.setData(publishList);
     }
 
     @Override
-    public ResponseMessage electiveList(String studentId) {
-        return null;
+    public ResponseMessage allPublishList(String studentId) {
+        List<Publish> publishList=publishRepository.findBySemester(semester);
+        return StatusMessage.getSuccess.setData(publishList);
     }
 
     @Override
-    public ResponseMessage getAssignmentGrade(String studentId, String assignmentId) {
-        return null;
+    public String getAssignmentGrade(String studentId, long assignmentId) {
+        Assignment assignment=assignmentRepository.findById(assignmentId).get();
+        return assignment.getGradesFilePath();
     }
 
     @Override
-    public ResponseMessage getCourseGrade(String studentId, String publishId) {
-        return null;
+    public String getCourseGrade(String studentId, long publishId) {
+        Publish publish=publishRepository.findById(publishId).get();
+        return publish.getGradesFilePath();
     }
 
     @Override
-    public ResponseMessage approveCourse(String adminId, long courseId) {
-        return null;
+    public ResponseMessage approveCourse(long courseId) {
+        Course course=courseRepository.findById(courseId).get();
+        course.setApproved(true);
+        courseRepository.save(course);
+        return StatusMessage.approveSuccess;
     }
 
     @Override
-    public ResponseMessage approvePublish(String adminId, long publishId) {
-        return null;
+    public ResponseMessage approvePublish(long publishId) {
+        Publish publish=publishRepository.findById(publishId).get();
+        publish.setApproved(true);
+        publishRepository.save(publish);
+        return StatusMessage.approveSuccess;
     }
 
     @Override
-    public ResponseMessage cutOffElection(String adminId, long publishId) {
-        return null;
+    public ResponseMessage cutOffElection(long publishId) {
+        List<UndistributedElection> undistributedElectionList=undistributedRepository.findByPublish(new Publish(publishId));
+        ArrayList<Election> elections=new ArrayList<>();
+        for (UndistributedElection u : undistributedElectionList) {
+            elections.add(new Election(u));
+        }
+        electionRepository.saveAll(elections);
+        undistributedRepository.deleteAll(undistributedElectionList);
+        return StatusMessage.cutOffSuccess;
     }
+
+    @Override
+    public ResponseMessage getToBeApproveCourse(long courseId) {
+        return StatusMessage.getSuccess.setData(courseRepository.findByApproved(false));
+    }
+
+    @Override
+    public ResponseMessage getToBeApprovePublish(long publishId) {
+        return StatusMessage.getSuccess.setData(publishRepository.findByApproved(false));
+    }
+
+
 }

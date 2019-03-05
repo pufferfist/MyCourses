@@ -16,7 +16,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Post {
     @GeneratedValue
     @Id
@@ -30,11 +29,23 @@ public class Post {
     @JoinColumn(name = "userId")
     private User user;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "post")
-    @OrderBy(value = "floorNumber asc")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "post")
+    @OrderBy(value = "time asc")
     private Set<FollowUp> followUpList;
 
     private String title;
     private String text;
     private Calendar time;
+
+    public Post(Course course, User user, String title, String text, Calendar time) {
+        this.course = course;
+        this.user = user;
+        this.title = title;
+        this.text = text;
+        this.time = time;
+    }
+
+    public Post(long id){
+        this.id=id;
+    }
 }

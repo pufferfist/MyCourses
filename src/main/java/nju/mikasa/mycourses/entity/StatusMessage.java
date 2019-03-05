@@ -36,5 +36,6 @@ public class StatusMessage {
     public static ResponseMessage createSuccess=new ResponseMessage(0,"Create entity success");
     public static ResponseMessage notExist=new ResponseMessage(6001,"Entity not exist");
 
-
+    public static ResponseMessage cutOffSuccess=new ResponseMessage(0,"Publish cut off success");
+    public static ResponseMessage approveSuccess=new ResponseMessage(0,"Approve success");
 }

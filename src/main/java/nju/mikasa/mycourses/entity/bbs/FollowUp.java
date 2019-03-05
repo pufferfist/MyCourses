@@ -13,7 +13,6 @@ import java.util.Calendar;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class FollowUp {
     @Id
     @GeneratedValue
@@ -23,12 +22,17 @@ public class FollowUp {
     @JoinColumn(name = "postId")
     private Post post;
 
-    private int floorNumber;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
     private User user;
 
     private String text;
     private Calendar time;
+
+    public FollowUp(Post post, User user, String text, Calendar time) {
+        this.post = post;
+        this.user = user;
+        this.text = text;
+        this.time = time;
+    }
 }

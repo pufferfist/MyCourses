@@ -11,4 +11,6 @@ import java.util.List;
 public interface PublishRepository extends JpaRepository<Publish,Long> {
     List<Publish> findByTeacher(User teacher);
     List<Publish> findByTeacherAndSemester(User teacher,String semester);
+    List<Publish> findBySemester(String semester);
+    List<Publish> findByApproved(boolean approved);
 }
