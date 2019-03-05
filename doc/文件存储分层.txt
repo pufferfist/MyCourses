@@ -1,0 +1,12 @@
+static
+    CourseFiles
+        -1(软工1)
+            -handout
+            -publish
+                -2019年春1班
+                    -grade.csv
+                    -5(assignment1)
+                        -grade.csv
+                        -uploads
+                            -161250146.zip
+                -2018年秋
