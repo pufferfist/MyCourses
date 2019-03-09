@@ -6,6 +6,8 @@ static
                 -2019年春1班
                     -grade.csv
                     -5(assignment1)
+                        -assignment.pdf
+                        -assignments.zip
                         -grade.csv
                         -uploads
                             -161250146.zip

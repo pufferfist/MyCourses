@@ -1,6 +1,8 @@
 package nju.mikasa.mycourses.entity;
 
 public class StatusMessage {
+    public static ResponseMessage redirect=new ResponseMessage(302,"Redirect","http://localhost:8087/login");
+
     public static ResponseMessage loginSuccess = new ResponseMessage(0, "Login success");
     public static ResponseMessage unknownUsername = new ResponseMessage(1001, "Unknown username");
     public static ResponseMessage incorrectPassword = new ResponseMessage(1002, "Incorrect password");
@@ -34,7 +36,9 @@ public class StatusMessage {
 
     public static ResponseMessage getSuccess=new ResponseMessage(0,"Get stuff success");
     public static ResponseMessage createSuccess=new ResponseMessage(0,"Create entity success");
+    public static ResponseMessage groupEmailSuccess=new ResponseMessage(0,"Send group email success");
     public static ResponseMessage notExist=new ResponseMessage(6001,"Entity not exist");
+    public static ResponseMessage fileNotExist=new ResponseMessage(6001,"File not exist");
 
     public static ResponseMessage cutOffSuccess=new ResponseMessage(0,"Publish cut off success");
     public static ResponseMessage approveSuccess=new ResponseMessage(0,"Approve success");

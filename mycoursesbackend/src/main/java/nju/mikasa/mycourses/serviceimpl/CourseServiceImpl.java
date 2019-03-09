@@ -10,12 +10,16 @@ import nju.mikasa.mycourses.entity.user.User;
 import nju.mikasa.mycourses.exception.RollBackException;
 import nju.mikasa.mycourses.repository.*;
 import nju.mikasa.mycourses.service.CourseService;
+import nju.mikasa.mycourses.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +28,8 @@ import java.util.Optional;
 public class CourseServiceImpl implements CourseService {
     @Autowired
     private DetectService detectService;
+    @Autowired
+    private MailService mailService;
     @Autowired
     private CourseRepository courseRepository;
     @Autowired
@@ -111,8 +117,19 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public ResponseMessage downloadAssignment(String teacherId, long assignmentId) {
-        return null;
+    public String downloadAssignment(String teacherId, long assignmentId) {
+        Assignment assignment = detectService.detectAssignment(teacherId, assignmentId);
+        if (assignment == null) {
+            return null;
+        }
+        String path = assignment.getRequirementFilePath();
+        String fromPath = path.substring(0, path.lastIndexOf("/")) + "/uploads";
+        if(!new File(fromPath).exists()){
+            return null;
+        }
+//        String toPath = path.substring(0, path.lastIndexOf("/")) + "/assignments.zip";
+
+        return fromPath;
     }
 
     @Override
@@ -198,7 +215,17 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage groupEmail(String teacherId, long publishId, String title, String text) {
-        return null;
+        Publish publish = detectService.detectPublish(teacherId, publishId);
+        if (publish == null) {
+            return StatusMessage.usernameNotMatch;
+        }
+        List<Election> electionList = electionRepository.findByPublish(new Publish(publishId));
+        String[] addressList = new String[electionList.size()];
+        for (int i = 0; i < electionList.size(); i++) {
+            addressList[i] = electionList.get(i).getStudent().getEmail();
+        }
+        mailService.sendGroupEmail(addressList, title, text);
+        return StatusMessage.groupEmailSuccess;
     }
 
     @Override
@@ -209,8 +236,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage publishList(String teacherId) {
-        List<Publish> publisheList = publishRepository.findByTeacher(new User(teacherId));
-        return StatusMessage.getSuccess.setData(publisheList);
+        List<Publish> publishList = publishRepository.findByTeacher(new User(teacherId));
+        return StatusMessage.getSuccess.setData(publishList);
     }
 
     @Override
@@ -297,8 +324,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage electivedCourseList(String studentId) {
-        List<Election> electionList=electionRepository.findByStudent(new User(studentId));
-        ArrayList<Publish> publishList=new ArrayList<>();
+        List<Election> electionList = electionRepository.findByStudent(new User(studentId));
+        ArrayList<Publish> publishList = new ArrayList<>();
         for (Election e : electionList) {
             publishList.add(e.getPublish());
         }
@@ -307,25 +334,25 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage allPublishList(String studentId) {
-        List<Publish> publishList=publishRepository.findBySemester(semester);
+        List<Publish> publishList = publishRepository.findBySemester(semester);
         return StatusMessage.getSuccess.setData(publishList);
     }
 
     @Override
     public String getAssignmentGrade(String studentId, long assignmentId) {
-        Assignment assignment=assignmentRepository.findById(assignmentId).get();
+        Assignment assignment = assignmentRepository.findById(assignmentId).get();
         return assignment.getGradesFilePath();
     }
 
     @Override
     public String getCourseGrade(String studentId, long publishId) {
-        Publish publish=publishRepository.findById(publishId).get();
+        Publish publish = publishRepository.findById(publishId).get();
         return publish.getGradesFilePath();
     }
 
     @Override
     public ResponseMessage approveCourse(long courseId) {
-        Course course=courseRepository.findById(courseId).get();
+        Course course = courseRepository.findById(courseId).get();
         course.setApproved(true);
         courseRepository.save(course);
         return StatusMessage.approveSuccess;
@@ -333,7 +360,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage approvePublish(long publishId) {
-        Publish publish=publishRepository.findById(publishId).get();
+        Publish publish = publishRepository.findById(publishId).get();
         publish.setApproved(true);
         publishRepository.save(publish);
         return StatusMessage.approveSuccess;
@@ -341,8 +368,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage cutOffElection(long publishId) {
-        List<UndistributedElection> undistributedElectionList=undistributedRepository.findByPublish(new Publish(publishId));
-        ArrayList<Election> elections=new ArrayList<>();
+        List<UndistributedElection> undistributedElectionList = undistributedRepository.findByPublish(new Publish(publishId));
+        ArrayList<Election> elections = new ArrayList<>();
         for (UndistributedElection u : undistributedElectionList) {
             elections.add(new Election(u));
         }

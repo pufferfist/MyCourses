@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
             if (user.get().isDeleted())
                 return StatusMessage.userIsDeleted;
             if (user.get().getPassword().equals(encrypt(password)))
-                return StatusMessage.loginSuccess;
+                return StatusMessage.loginSuccess.setData(user.get().getType());
             else
                 return StatusMessage.incorrectPassword;
         } else
@@ -87,16 +87,6 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
-    }
-
-
-    @Override
-    public ResponseMessage isUsernameUsed(String username) {
-        Optional<User> opt = userRepository.findById(username);
-        if (opt.isPresent())
-            return StatusMessage.userAlreadyExist;
-        else
-            return StatusMessage.usernameNotUsed;
     }
 
     @Override

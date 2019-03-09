@@ -10,8 +10,6 @@ public interface UserService {
 
     ResponseMessage verify(String id,String verifyCode);
 
-    ResponseMessage isUsernameUsed(String username);
-
     ResponseMessage getInfo(String username);
 
     ResponseMessage deleteUser(String username);

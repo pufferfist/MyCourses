@@ -4,6 +4,9 @@ import nju.mikasa.mycourses.entity.ResponseMessage;
 import nju.mikasa.mycourses.exception.RollBackException;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import java.io.FileOutputStream;
+
 public interface CourseService {
     /**
      * teacher part
@@ -18,7 +21,7 @@ public interface CourseService {
 
     ResponseMessage publishAssignment(String teacherId, long publishId, String name, String description, String deadLine, MultipartFile file) throws RollBackException;
 
-    ResponseMessage downloadAssignment(String teacherId, long assignmentId);
+    String downloadAssignment(String teacherId, long assignmentId);
 
     ResponseMessage publishAssignmentGrades(String teacherId, long assignmentId, MultipartFile file);
 
