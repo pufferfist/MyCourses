@@ -22,15 +22,64 @@ export default new Router({
       component:()=>import("../pages/FatherPage"),
       children:[
         {
-          path: '/student',
+          path: 'student',
           name: 'student',
-          component: () => import('../pages/StudentHome')
+          component: () => import('../pages/Student')
         },
         {
-          path: '/teacher',
+          path: 'teacher',
           name: 'teacher',
-          component: () => import('../pages/TeacherHome')
+          component: () => import('../pages/Teacher'),
+          children:[
+            {
+              path:"home",
+              name:"teacherHome",
+              component:()=>import('../components/teacher/TeacherHome')
+            },
+            {
+              path: 'createCourse',
+              name: 'createCourse',
+              component: () => import('../components/teacher/CreateCourse')
+            },
+            {
+              path: 'createPublish',
+              name: 'createPublish',
+              component: () => import('../components/teacher/CreatePublish')
+            },
+          ]
         },
+        {
+          path: 'admin',
+          name: 'admin',
+          component: () => import('../pages/Admin'),
+          children:[
+            {
+              path:"home",
+              name:"adminHome",
+              component:()=>import('../components/admin/Statistics')
+            },
+            {
+              path: 'approveCourse',
+              name: 'approveCourse',
+              component: () => import('../components/admin/ApproveCourse')
+            },
+            {
+              path: 'approvePublish',
+              name: 'approvePublish',
+              component: () => import('../components/admin/ApprovePublish')
+            },
+            {
+              path: 'cutOff',
+              name: 'cutOff',
+              component: () => import('../components/admin/CutOff')
+            },
+          ]
+        },
+        {
+          path:'admin/courseInfo',
+          name:'adminCourseInfo',
+          component:()=>import('../pages/AdminCourseInfo')
+        }
       ]
     },
   ]

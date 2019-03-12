@@ -135,12 +135,17 @@ public class CourseController {
     }
 
     @PostMapping("getToBeApproveCourse")
-    public ResponseMessage getToBeApproveCourse(@RequestBody Map<String, Object> params) {
-        return courseService.getToBeApproveCourse(Long.parseLong(params.get("courseId").toString()));
+    public ResponseMessage getToBeApproveCourse() {
+        return courseService.getToBeApproveCourse();
     }
 
     @PostMapping("getToBeApprovePublish")
-    public ResponseMessage getToBeApprovePublish(@RequestBody Map<String, Object> params) {
-        return courseService.getToBeApprovePublish(Long.parseLong(params.get("publishId").toString()));
+    public ResponseMessage getToBeApprovePublish() {
+        return courseService.getToBeApprovePublish();
+    }
+
+    @PostMapping("getToBeCutOffPublish")
+    public ResponseMessage getToBeCutOffPublish() {
+        return courseService.getToBeCutOffPublish();
     }
 }

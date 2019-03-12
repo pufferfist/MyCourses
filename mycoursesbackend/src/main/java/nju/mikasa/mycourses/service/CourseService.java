@@ -75,7 +75,9 @@ public interface CourseService {
 
     ResponseMessage cutOffElection(long publishId);
 
-    ResponseMessage getToBeApproveCourse(long courseId);
+    ResponseMessage getToBeApproveCourse();
 
-    ResponseMessage getToBeApprovePublish(long publishId);
+    ResponseMessage getToBeApprovePublish();
+
+    ResponseMessage getToBeCutOffPublish();
 }

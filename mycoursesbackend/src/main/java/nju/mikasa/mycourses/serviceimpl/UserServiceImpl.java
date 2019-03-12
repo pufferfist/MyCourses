@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
             if (user.get().isDeleted())
                 return StatusMessage.userIsDeleted;
             if (user.get().getPassword().equals(encrypt(password)))
-                return StatusMessage.loginSuccess.setData(user.get().getType());
+                return StatusMessage.loginSuccess.setData(user);
             else
                 return StatusMessage.incorrectPassword;
         } else

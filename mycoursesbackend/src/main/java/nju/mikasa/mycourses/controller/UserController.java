@@ -18,14 +18,14 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private HttpServletRequest request;
 
     @PostMapping("login")
     public ResponseMessage login(@RequestBody Map<String, Object> params){
         ResponseMessage res=userService.login(params.get("username").toString(),params.get("password").toString());
         if (res.getCode()==0){
-            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-            HttpSession session = request.getSession(true);
-            session.setAttribute("username",params.get("username").toString());
+            request.getSession(true).setAttribute("username",params.get("username").toString());
         }
         return res;
     }
@@ -48,5 +48,11 @@ public class UserController {
     @PostMapping("delete")
     public ResponseMessage deleteUser(@RequestBody Map<String, Object> params){
         return userService.deleteUser(params.get("username").toString());
+    }
+
+    @PostMapping("logout")
+    public ResponseMessage deleteUser(){
+        request.getSession().invalidate();
+        return StatusMessage.logoutSuccess;
     }
 }

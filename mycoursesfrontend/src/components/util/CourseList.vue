@@ -1,6 +1,8 @@
 <template>
     <div>
-      <course-item v-for="courseItem in courseList" v-bind:course="courseItem"></course-item>
+      <course-item v-for="courseItem in courseList"
+                   :key="courseItem.id"
+                   v-bind:course="courseItem"></course-item>
     </div>
 </template>
 

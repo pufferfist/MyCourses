@@ -20,9 +20,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -66,7 +64,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         Publish publish = new Publish(course, course.getTeacher(), CourseServiceImpl.semester, classHours, dayOfWeek, startWeek, weekNumber, classroom, maxStudentNumber,
-                0, classNumber, false, null);
+                0, classNumber, null);
         publishRepository.save(publish);
         return StatusMessage.createSuccess;
     }
@@ -370,8 +368,22 @@ public class CourseServiceImpl implements CourseService {
     public ResponseMessage cutOffElection(long publishId) {
         List<UndistributedElection> undistributedElectionList = undistributedRepository.findByPublish(new Publish(publishId));
         ArrayList<Election> elections = new ArrayList<>();
-        for (UndistributedElection u : undistributedElectionList) {
-            elections.add(new Election(u));
+        Publish publish=publishRepository.findById(publishId).get();
+        int max=publish.getMaxStudentNumber();
+        if(undistributedElectionList.size()<=max) {
+            for (UndistributedElection u : undistributedElectionList) {
+                elections.add(new Election(u));
+            }
+        }else{
+            Random random=new Random();
+            HashSet<Integer> set=new HashSet<>();
+            do {
+                set.add(random.nextInt(undistributedElectionList.size()));
+            } while (set.size() < max);
+
+            for(Integer i:set){
+                elections.add(new Election(undistributedElectionList.get(i)));
+            }
         }
         electionRepository.saveAll(elections);
         undistributedRepository.deleteAll(undistributedElectionList);
@@ -379,13 +391,18 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public ResponseMessage getToBeApproveCourse(long courseId) {
+    public ResponseMessage getToBeApproveCourse() {
         return StatusMessage.getSuccess.setData(courseRepository.findByApproved(false));
     }
 
     @Override
-    public ResponseMessage getToBeApprovePublish(long publishId) {
+    public ResponseMessage getToBeApprovePublish() {
         return StatusMessage.getSuccess.setData(publishRepository.findByApproved(false));
+    }
+
+    @Override
+    public ResponseMessage getToBeCutOffPublish() {
+        return StatusMessage.getSuccess.setData(publishRepository.findByApprovedAndCutOffed(true, false));
     }
 
 

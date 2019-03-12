@@ -29,7 +29,10 @@ public class Publish {
     private String semester;
     //课时数
     private int classHours;
+    //从每天的第几节开始
+    private int classOrder;
     private int dayOfWeek;
+
     private int startWeek;
     private int weekNumber;
     //教室名
@@ -41,12 +44,13 @@ public class Publish {
     //班级号
     private int classNumber;
     private boolean approved;
+    private boolean cutOffed;
     //成绩文件路径
     private String gradesFilePath;
 
     public Publish(Course course, User teacher, String semester, int classHours, int dayOfWeek,
                    int startWeek, int weekNumber, String classroom, int maxStudentNumber,
-                   int currentStudentNumber, int classNumber, boolean approved, String gradesFilePath) {
+                   int currentStudentNumber, int classNumber, String gradesFilePath) {
         this.course = course;
         this.teacher = teacher;
         this.semester = semester;
@@ -58,7 +62,8 @@ public class Publish {
         this.maxStudentNumber = maxStudentNumber;
         this.currentStudentNumber = currentStudentNumber;
         this.classNumber = classNumber;
-        this.approved = approved;
+        this.approved = false;
+        this.cutOffed=false;
         this.gradesFilePath = gradesFilePath;
     }
 

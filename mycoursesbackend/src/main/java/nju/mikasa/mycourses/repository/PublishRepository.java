@@ -13,4 +13,5 @@ public interface PublishRepository extends JpaRepository<Publish,Long> {
     List<Publish> findByTeacherAndSemester(User teacher,String semester);
     List<Publish> findBySemester(String semester);
     List<Publish> findByApproved(boolean approved);
+    List<Publish> findByApprovedAndCutOffed(boolean approved,boolean cutOffed);
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="mt3 center">
-    <router-link to="{{path}}">
+    <router-link :to="path">
       <el-button type="primary" round>
         <slot></slot>
       </el-button>
@@ -10,7 +10,7 @@
 
 <script>
   export default {
-    name: "ButtonItem",
+    name: "RouterButton",
     props: ["path"]
   }
 </script>

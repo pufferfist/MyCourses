@@ -62,13 +62,17 @@
                   duration: 0.5
                 });
                 let user=response.data.data;
-                if(user==="STUDENT") {
-                  this.$router.push("/student")
-                }else if(user==="TEACHER"){
-                  this.$router.push("/teacher")
+                if(user.type==="STUDENT") {
+                  this.$store.commit("type","student");
+                  this.$router.push("/student/home")
+                }else if(user.type==="TEACHER"){
+                  this.$store.commit("type","teacher");
+                  this.$router.push("/teacher/home")
                 }else{
-                  this.$router.push("/admin")
+                  this.$store.commit("type","admin");
+                  this.$router.push("/admin/home")
                 }
+                this.$store.commit("id",user.name)
               } else if (response.data.code === 1001) {
                 this.$Message.warning("用户名不存在")
               } else if (response.data.code === 1002) {

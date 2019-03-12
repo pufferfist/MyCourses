@@ -53,4 +53,11 @@ public class MycoursesApplicationTests {
         List<Course> test2=courseRepository.findByTeacher(teacher2);
     }
 
+    @Test
+    public void addAdmin(){
+        userRepository.save(new User("admin","管理员",
+                "puffferfist@gmail.com", new Sha256Hash("92649486").toString(),
+                Type.ADMINISTRATOR,false,"123456", Calendar.getInstance(),true));
+    }
+
 }
