@@ -3,7 +3,7 @@
     <div slot="header" class="cf f3 tl">
       <span>{{publish.course.name}}</span>
     </div>
-    <el-form label-position="left" inline class="demo-table-expand tl" label-width="120px">
+    <el-form label-position="left" class="demo-table-expand tl" label-width="120px">
       <el-form-item label="课程id">
         <span>{{publish.id}}</span>
       </el-form-item>

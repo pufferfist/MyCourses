@@ -17,7 +17,7 @@ public class Util {
         try {
             path = ResourceUtils.getURL("classpath:static").getPath().replace("%20"," ");
             path=path.substring(1);
-            path+="\\CourseFiles";
+            path+="/CourseFiles";
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

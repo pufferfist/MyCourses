@@ -5,7 +5,7 @@
     </div>
     <a v-for="handout in handoutList"
        :key="handout.id"
-       :href="'http://localhost:8088'+getPath(handout.filePath)"
+       :href="'http://localhost:8088'+this.getPath(handout.filePath)"
        class="pv2 db">{{handout.name}}</a>
   </el-card>
 </template>
@@ -29,12 +29,6 @@
             this.$message.error("获取课件列表出错");
           }
         })
-    },
-    methods: {
-      getPath(serverPath) {
-        let index = serverPath.indexOf("static") + 6;
-        return serverPath.slice(index);
-      }
     },
     watch: {
       change: function () {

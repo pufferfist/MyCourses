@@ -48,9 +48,8 @@ public class CourseController {
 
 
     @PostMapping("publishAssignmentGrades")
-    public ResponseMessage publishAssignmentGrades(@RequestBody Map<String, Object> params) {
-        return courseService.publishAssignmentGrades(session.getAttribute("username").toString(),
-                Long.parseLong(params.get("assignmentId").toString()), (MultipartFile) params.get("file"));
+    public ResponseMessage publishAssignmentGrades(long assignmentId,MultipartFile file) {
+        return courseService.publishAssignmentGrades(session.getAttribute("username").toString(), assignmentId,file);
     }
 
     @PostMapping("publishCourseGrades")

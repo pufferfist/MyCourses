@@ -61,6 +61,10 @@ export default new Router({
           path:'teacher/publishInfo',
           name:'teacherPublishInfo',
           component:()=>import('../pages/TeacherPublishInfo')
+        },{
+          path:'teacher/assignmentInfo',
+          name:'teacherAssignmentInfo',
+          component:()=>import('../pages/TeacherAssignmentInfo')
         },
         {
           path: 'admin',

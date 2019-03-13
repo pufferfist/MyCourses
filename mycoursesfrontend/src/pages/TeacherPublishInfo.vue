@@ -5,7 +5,7 @@
         <el-row>
           <publish-info v-bind:publish="publish"></publish-info>
         </el-row>
-        <el-row>
+        <el-row class="pt3">
           <assignment-list v-bind:change="change"></assignment-list>
         </el-row>
       </el-col>
