@@ -48,13 +48,14 @@ public class Publish {
     //成绩文件路径
     private String gradesFilePath;
 
-    public Publish(Course course, User teacher, String semester, int classHours, int dayOfWeek,
+    public Publish(Course course, User teacher, String semester, int classHours,int classOrder, int dayOfWeek,
                    int startWeek, int weekNumber, String classroom, int maxStudentNumber,
                    int currentStudentNumber, int classNumber, String gradesFilePath) {
         this.course = course;
         this.teacher = teacher;
         this.semester = semester;
         this.classHours = classHours;
+        this.classOrder=classOrder;
         this.dayOfWeek = dayOfWeek;
         this.startWeek = startWeek;
         this.weekNumber = weekNumber;

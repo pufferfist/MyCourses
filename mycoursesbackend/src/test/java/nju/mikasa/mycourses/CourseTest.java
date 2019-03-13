@@ -1,5 +1,6 @@
 package nju.mikasa.mycourses;
 
+import nju.mikasa.mycourses.entity.Util;
 import nju.mikasa.mycourses.entity.course.Course;
 import nju.mikasa.mycourses.repository.CourseRepository;
 import nju.mikasa.mycourses.service.CourseService;
@@ -21,6 +22,11 @@ public class CourseTest {
     public void courseCreateTest(){
         courseService.createCourse("测试创建课程","T1234567@smail.nju.edu.cn","test");
         Course a=courseRepository.findById((long) 2).get();
+    }
+
+    @Test
+    public void pathTest(){
+        String staticPath= Util.getStaticPath();
     }
 
 }

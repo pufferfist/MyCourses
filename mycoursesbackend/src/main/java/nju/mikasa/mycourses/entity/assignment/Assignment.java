@@ -1,5 +1,6 @@
 package nju.mikasa.mycourses.entity.assignment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,9 @@ public class Assignment {
     private Publish publish;
 
     private String name;
+    @Column(columnDefinition="TEXT")
     private String description;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Calendar deadLine;
 
     private String requirementFilePath;

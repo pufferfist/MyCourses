@@ -1,5 +1,5 @@
 <template>
-  <div class="pt2 pb2 ba-ns mb3">
+  <div class="pt2 pb2 border mb3 f2">
     <a v-on:click="transfer">{{publish.course.name}}</a>
   </div>
 </template>
@@ -18,5 +18,9 @@
 </script>
 
 <style scoped>
-
+  .border{
+    border-radius: 3px;
+    border: 1px solid;
+    border-color: rgba(138,138,138,0.32);
+  }
 </style>

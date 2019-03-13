@@ -3,7 +3,7 @@
     <div slot="header" class="cf f3 tl">
       <span>{{publish.course.name}}</span>
     </div>
-    <el-form label-position="left" inline class="demo-table-expand tl">
+    <el-form label-position="left" inline class="demo-table-expand tl" label-width="120px">
       <el-form-item label="课程id">
         <span>{{publish.id}}</span>
       </el-form-item>
@@ -53,6 +53,7 @@
             result+=this.publish.classOrder+'~';
             result+=(this.publish.classOrder+this.publish.classHours-1);
             result+='节';
+            return result;
           }
       }
     }

@@ -15,9 +15,9 @@ public class Util {
     public static String getStaticPath(){
         String path= null;
         try {
-            path = ResourceUtils.getURL("classpath:static").getPath().replace("%20"," ").replace('/', '\\');
+            path = ResourceUtils.getURL("classpath:static").getPath().replace("%20"," ");
             path=path.substring(1);
-            path+="/CourseFiles";
+            path+="\\CourseFiles";
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -43,7 +43,7 @@ public class Util {
         }
         File desFile=new File(filePath);
         if(!desFile.getParentFile().exists()){
-            desFile.mkdirs();
+            desFile.getParentFile().mkdirs();
         }
         try {
             file.transferTo(desFile);

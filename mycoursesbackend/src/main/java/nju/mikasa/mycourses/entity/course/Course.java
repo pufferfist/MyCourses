@@ -1,5 +1,6 @@
 package nju.mikasa.mycourses.entity.course;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,11 +24,13 @@ public class Course {
     @JoinColumn(name = "teacherId")
     private User teacher;
 
+    @Column(columnDefinition="TEXT")
     private String description;
     private boolean approved;
 
+    @JsonIgnore
     @OneToMany(fetch=FetchType.EAGER,mappedBy = "course")
-    @OrderBy(value = "id ASC")
+    @OrderBy(value = "id desc")
     private Set<Publish> publishList;
 
     public Course(String name, User teacher, String description, boolean approved) {

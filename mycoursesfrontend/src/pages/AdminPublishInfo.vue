@@ -28,7 +28,7 @@
       },
       methods:{
         approve(){
-          this.axios.post("/backend/approvePublish",{courseId:this.publish.id})
+          this.axios.post("/backend/approvePublish",{publishId:this.publish.id})
             .then(res=>{
               if(res.data.code===0){
                 this.$message.success("审批成功");
@@ -39,7 +39,7 @@
             })
         },
         cutOff(){
-          this.axios.post("/backend/cutOffElection",{courseId:this.publish.id})
+          this.axios.post("/backend/cutOffElection",{publishId:this.publish.id})
             .then(res=>{
               if(res.data.code===0){
                 this.$message.success("截止成功");

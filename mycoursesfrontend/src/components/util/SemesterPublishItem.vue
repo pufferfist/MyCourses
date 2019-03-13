@@ -1,12 +1,12 @@
 <template>
-  <div class="pt2 pb2 ba-ns mb3">
-    <a v-on:click="transfer">{{publish.semester}}</a>
+  <div class="pt2 pb2 border mb3 f2">
+    <a v-on:click="transfer">{{publish.semester}}{{publish.classNumber}}班</a>
   </div>
 </template>
 
 <script>
   export default {
-    name: "PublishSemesterItem",
+    name: "SemesterPublishItem",
     props: ["publish"],
     methods:{
       transfer(){
@@ -18,5 +18,9 @@
 </script>
 
 <style scoped>
-
+  .border{
+    border-radius: 3px;
+    border: 1px solid;
+    border-color: rgba(138,138,138,0.32);
+  }
 </style>

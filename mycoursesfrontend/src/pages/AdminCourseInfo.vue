@@ -9,8 +9,7 @@
           <div slot="header" class="cf f3 tl">
             <span>历史发布</span>
           </div>
-          <publish-list v-bind:publish-list="course.publishList"
-                        v-bind:type="'standard'"></publish-list>
+          <semester-publish-list v-bind:publish-list="publishList"></semester-publish-list>
         </el-card>
       </el-row>
     </el-col>
@@ -24,34 +23,51 @@
 </template>
 
 <script>
-    import ButtonItem from "../components/util/ButtonItem";
-    import CourseInfo from "../components/util/CourseInfo";
-    import PublishList from "../components/util/PublishList";
-    export default {
-        name: "AdminCourseInfo",
-      components: {PublishList, CourseInfo, ButtonItem},
-      computed:{
-        course(){
-            return this.$store.state.course;
+  import ButtonItem from "../components/util/ButtonItem";
+  import CourseInfo from "../components/util/CourseInfo";
+  import PublishList from "../components/util/PublishList";
+  import SemesterPublishList from "../components/util/SemesterPublishList";
+
+  export default {
+    name: "AdminCourseInfo",
+    components: {SemesterPublishList, PublishList, CourseInfo, ButtonItem},
+    data(){
+      return{
+        publishList:[]
+      }
+    },
+    beforeCreate: function () {
+      this.axios.post("/backend/coursePublishList",{courseId:this.course.id})
+        .then(res=>{
+          if (res.data.code === 0) {
+            this.publishList=res.data.data;
+          }else {
+            this.$message.error("获取发布列表错误");
           }
+        })
+    },
+    computed: {
+      course() {
+        return this.$store.state.course;
+      }
+    },
+    methods: {
+      approve() {
+        this.axios.post("/backend/approveCourse", {courseId: this.course.id})
+          .then(res => {
+            if (res.data.code === 0) {
+              this.$message.success("审批成功");
+              this.course.approved = true
+            } else {
+              this.$message.warning("审批失败");
+            }
+          })
       },
-      methods:{
-          approve(){
-            this.axios.post("/backend/approveCourse",{courseId:this.course.id})
-              .then(res=>{
-                if(res.data.code===0){
-                  this.$message.success("审批成功");
-                  this.course.approved=true
-                }else {
-                  this.$message.warning("审批失败");
-                }
-              })
-          },
-        goBack(){
-          this.$router.go(-1);
-        }
+      goBack() {
+        this.$router.go(-1);
       }
     }
+  }
 </script>
 
 <style scoped>

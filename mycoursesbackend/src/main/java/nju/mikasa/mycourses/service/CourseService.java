@@ -14,7 +14,7 @@ public interface CourseService {
 
     ResponseMessage createCourse(String name, String teacherId, String description);
 
-    ResponseMessage publishCourse(long courseId, String teacherId, String semester, int classHours, int dayOfWeek,
+    ResponseMessage publishCourse(long courseId, String teacherId, String semester, int classHours,int classOrder, int dayOfWeek,
                                   int startWeek, int weekNumber, String classroom, int maxStudentNumber, int classNumber);
 
     ResponseMessage uploadHandout(String teacherId, long courseId, String name, MultipartFile file);
@@ -35,6 +35,8 @@ public interface CourseService {
     ResponseMessage publishList(String teacherId);
 
     ResponseMessage publishList(String teacherId, String semester);
+
+    ResponseMessage publishList(String teacherId, long courseId);
 
     ResponseMessage handoutList(long courseId);
 

@@ -11,4 +11,5 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course,Long> {
     List<Course> findByTeacher(User teacher);
     List<Course> findByApproved(boolean approved);
+    List<Course> findByTeacherAndApproved(User teacher, boolean approved);
 }

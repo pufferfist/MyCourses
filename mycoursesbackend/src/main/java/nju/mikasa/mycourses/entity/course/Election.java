@@ -33,4 +33,10 @@ public class Election {
         this.student=undistributedElection.getStudent();
         this.withdraw=false;
     }
+
+    public Election(Publish publish, User student, boolean withdraw) {
+        this.publish = publish;
+        this.student = student;
+        this.withdraw = withdraw;
+    }
 }

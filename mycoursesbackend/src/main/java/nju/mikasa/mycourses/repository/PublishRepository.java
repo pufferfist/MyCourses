@@ -9,9 +9,9 @@ import java.util.List;
 
 @Repository
 public interface PublishRepository extends JpaRepository<Publish,Long> {
-    List<Publish> findByTeacher(User teacher);
-    List<Publish> findByTeacherAndSemester(User teacher,String semester);
-    List<Publish> findBySemester(String semester);
+    List<Publish> findByTeacherAndApprovedOrderByIdDesc(User teacher,boolean approved);
+    List<Publish> findByTeacherAndSemesterOrderByIdDesc(User teacher, String semester);
+    List<Publish> findBySemesterOrderByIdDesc(String semester);
     List<Publish> findByApproved(boolean approved);
     List<Publish> findByApprovedAndCutOffed(boolean approved,boolean cutOffed);
 }

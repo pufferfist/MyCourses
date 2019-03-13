@@ -42,11 +42,25 @@ export default new Router({
               component: () => import('../components/teacher/CreateCourse')
             },
             {
+              path: 'courseList',
+              name: 'courseList',
+              component: () => import('../components/teacher/TeacherCourseList')
+            },
+            {
               path: 'createPublish',
               name: 'createPublish',
               component: () => import('../components/teacher/CreatePublish')
             },
           ]
+        },
+        {
+          path:'teacher/courseInfo',
+          name:'teacherCourseInfo',
+          component:()=>import('../pages/TeacherCourseInfo')
+        },{
+          path:'teacher/publishInfo',
+          name:'teacherPublishInfo',
+          component:()=>import('../pages/TeacherPublishInfo')
         },
         {
           path: 'admin',
@@ -79,7 +93,11 @@ export default new Router({
           path:'admin/courseInfo',
           name:'adminCourseInfo',
           component:()=>import('../pages/AdminCourseInfo')
-        }
+        },{
+          path:'admin/publishInfo',
+          name:'adminPublishInfo',
+          component:()=>import('../pages/AdminPublishInfo')
+        },
       ]
     },
   ]

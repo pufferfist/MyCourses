@@ -59,7 +59,7 @@
               if (response.data.code === 0) {
                 this.$Message.success({
                   content: "登录成功",
-                  duration: 0.5
+                  duration: 1
                 });
                 let user=response.data.data;
                 if(user.type==="STUDENT") {

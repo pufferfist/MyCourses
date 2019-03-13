@@ -42,4 +42,8 @@ public class StatusMessage {
 
     public static ResponseMessage cutOffSuccess=new ResponseMessage(0,"Publish cut off success");
     public static ResponseMessage approveSuccess=new ResponseMessage(0,"Approve success");
+
+    public static ResponseMessage electiveSeccess=new ResponseMessage(0,"elective in the class directly");
+    public static ResponseMessage electiveSeccessWait=new ResponseMessage(1,"wait to cut off");
+    public static ResponseMessage reachLimit=new ResponseMessage(7001,"reach the upper limit");
 }

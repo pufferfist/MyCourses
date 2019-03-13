@@ -28,23 +28,22 @@ public class CourseController {
     public ResponseMessage publishCourse(@RequestBody Map<String, Object> params) {
         return courseService.publishCourse(Long.parseLong(params.get("courseId").toString()),
                 session.getAttribute("username").toString(), params.get("semester").toString(),
-                Integer.parseInt(params.get("classHour").toString()), Integer.parseInt(params.get("dayOfWeek").toString()),
+                Integer.parseInt(params.get("classHour").toString()),Integer.parseInt(params.get("classOrder").toString())
+                , Integer.parseInt(params.get("dayOfWeek").toString()),
                 Integer.parseInt(params.get("startWeek").toString()), Integer.parseInt(params.get("weekNumber").toString()),
                 params.get("classroom").toString(), Integer.parseInt(params.get("maxStudentNumber").toString()),
                 Integer.parseInt(params.get("classNumber").toString()));
     }
 
     @PostMapping("uploadHandout")
-    public ResponseMessage uploadHandout(@RequestBody Map<String, Object> params) {
-        return courseService.uploadHandout(session.getAttribute("username").toString(),
-                Long.parseLong(params.get("courseId").toString()), params.get("name").toString(), (MultipartFile) params.get("file"));
+    public ResponseMessage uploadHandout(@RequestParam(value = "file")MultipartFile file, String name,long courseId) {
+        return courseService.uploadHandout(session.getAttribute("username").toString(), courseId, name, file);
     }
 
     @PostMapping("publishAssignment")
-    public ResponseMessage publishAssignment(@RequestBody Map<String, Object> params) throws RollBackException {
+    public ResponseMessage publishAssignment(long publishId,String name,String description,String deadline,MultipartFile file) throws RollBackException {
         return courseService.publishAssignment(session.getAttribute("username").toString(),
-                Long.parseLong(params.get("publishId").toString()), params.get("name").toString(), params.get("description").toString(),
-                params.get("deadline").toString(), (MultipartFile) params.get("file"));
+               publishId,name,description,deadline,file);
     }
 
 
@@ -74,6 +73,11 @@ public class CourseController {
     @PostMapping("publishList")
     public ResponseMessage publishList() {
         return courseService.publishList(session.getAttribute("username").toString());
+    }
+
+    @PostMapping("coursePublishList")
+    public ResponseMessage coursePublishList(@RequestBody Map<String, Object> params) {
+        return courseService.publishList(session.getAttribute("username").toString(),Long.parseLong(params.get("courseId").toString()));
     }
 
     @PostMapping("handoutList")

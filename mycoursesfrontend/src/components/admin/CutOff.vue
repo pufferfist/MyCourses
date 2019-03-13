@@ -3,8 +3,7 @@
     <div slot="header" class="cf f3 tl">
       <span>选课截止</span>
     </div>
-    <publish-list v-bind:courseList="publishList"
-                  v-bind:type="'admin'"></publish-list>
+    <publish-list v-bind:publishList="publishList"></publish-list>
   </el-card>
 </template>
 

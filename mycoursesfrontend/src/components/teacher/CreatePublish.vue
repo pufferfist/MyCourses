@@ -3,30 +3,38 @@
     <div slot="header" class="cf f3 tl">
       <span>发布课程</span>
     </div>
-    <el-form :label-position="labelPosition" label-width="80px" :model="form">
-      <el-form-item label="名称">
+    <el-form :label-position="labelPosition" label-width="120px" :model="form" class="tl">
+      <el-form-item label="名称" class="tl">
         {{course.name}}
       </el-form-item>
-      <el-form-item label="学期名">
+      <el-form-item label="学期名" class="tl">
         2019年春
       </el-form-item>
       <el-form-item label="课时数">
         <el-input
           placeholder="请输入内容"
-          v-model="form.classHours">
+          v-model="form.classHour">
         </el-input>
       </el-form-item>
       <el-form-item label="节数">
-        <el-input
-          placeholder="请输入内容"
-          v-model="form.classOrder">
-        </el-input>
+        <el-select v-model="form.classOrder" placeholder="请选择">
+          <el-option
+            v-for="item in classOrder.options"
+            :key="item.value"
+            :label="item.value"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="日期">
-        <el-input
-          placeholder="请输入内容"
-          v-model="form.dayOfWeek">
-        </el-input>
+        <el-select v-model="form.dayOfWeek" placeholder="请选择">
+          <el-option
+            v-for="item in weekday.options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="开始周">
         <el-input
@@ -69,13 +77,66 @@
 <script>
   export default {
     name: "CreatePublish",
-    props: ["course"],
+    computed:{
+      course(){
+        return this.$store.state.course;
+      }
+    },
     data() {
       return {
+        weekday:{
+          options: [{
+            value: 1,
+            label: '周一'
+          }, {
+            value: 2,
+            label: '周二'
+          }, {
+            value: 3,
+            label: '周三'
+          }, {
+            value: 4,
+            label: '周四'
+          }, {
+            value: 5,
+            label: '周五'
+          }, {
+            value: 6,
+            label: '周六'
+          }, {
+            value: 7,
+            label: '周日'
+          }]
+        },
+        classOrder:{options:[
+            {
+              value: "1",
+            },{
+              value: "2",
+            },{
+              value: "3",
+            },{
+              value: "4",
+            },{
+              value: "5",
+            },{
+              value: "6",
+            },{
+              value: "7",
+            },{
+              value: "8",
+            },{
+              value: "9",
+            },{
+              value: "10",
+            },{
+              value: "11"
+            },
+          ]},
         form: {
-          courseId:this.course.id,
-          semester: "",
-          classHours: "",
+          courseId:"",
+          semester: "2019年春",
+          classHour: "",
           classOrder: "",
           dayOfWeek: "",
           startWeek: "",
@@ -85,12 +146,13 @@
           currentStudentNumber: "",
           classNumber: "",
         },
-        labelPosition: 'right'
+          labelPosition: 'left'
       }
     },
     methods: {
       onSubmit() {
-        this.axios.post("/backend/createPublish", this.form)
+        this.form.courseId=this.course.id;
+        this.axios.post("/backend/publishCourse", this.form)
           .then((res) => {
             if (res.data.code === 0) {
               this.$Message.success({

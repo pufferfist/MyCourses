@@ -3,8 +3,7 @@
     <div slot="header" class="cf f3 tl">
       <span>课程概览</span>
     </div>
-    <publish-list v-bind:publishList="publishList"
-                  v-bind:type="'standard'"></publish-list>
+    <publish-list v-bind:publishList="publishList"></publish-list>
   </el-card>
 </template>
 
