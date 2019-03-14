@@ -22,10 +22,6 @@
   export default {
     name: "TeacherHome",
     components: {RouterButton},
-    data() {
-      return {}
-    },
-
   }
 </script>
 

@@ -9,7 +9,7 @@
       <el-card shadow="always">
         <button-item v-if="!publish.approved" v-on:click="approve">通过审批</button-item>
         <button-item v-if="publish.approved&&!publish.cutOffed" v-on:click="cutOff">选课截止</button-item>
-        <button-item v-on:click="goBack">返回</button-item>
+        <button-item v-on:click="goBack()">返回</button-item>
       </el-card>
     </el-col>
   </el-row>
@@ -48,9 +48,6 @@
                 this.$message.warning("截止失败");
               }
             })
-        },
-        goBack(){
-          this.$router.go(-1);
         }
       }
     }

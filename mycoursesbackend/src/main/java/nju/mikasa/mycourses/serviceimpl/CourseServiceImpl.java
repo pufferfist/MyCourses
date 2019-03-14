@@ -52,7 +52,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage publishCourse(long courseId, String teacherId, String semester,
-                                         int classHours,int classOrder, int dayOfWeek, int startWeek, int weekNumber,
+                                         int classHours, int classOrder, int dayOfWeek, int startWeek, int weekNumber,
                                          String classroom, int maxStudentNumber, int classNumber) {
         Course course = detectService.detectCourse(teacherId, courseId);
 
@@ -60,7 +60,7 @@ public class CourseServiceImpl implements CourseService {
             return StatusMessage.usernameNotMatch;
         }
 
-        Publish publish = new Publish(course, course.getTeacher(), CourseServiceImpl.semester, classHours,classOrder, dayOfWeek, startWeek, weekNumber, classroom, maxStudentNumber,
+        Publish publish = new Publish(course, course.getTeacher(), CourseServiceImpl.semester, classHours, classOrder, dayOfWeek, startWeek, weekNumber, classroom, maxStudentNumber,
                 0, classNumber, null);
         publishRepository.save(publish);
         return StatusMessage.createSuccess;
@@ -96,7 +96,7 @@ public class CourseServiceImpl implements CourseService {
         Assignment assignment = new Assignment(publish, name, description, Util.getCalendar(deadLine), null, null);
         assignment = assignmentRepository.save(assignment);
 
-        if(file!=null) {
+        if (file != null) {
             String filePath = Util.getStaticPath() + "/" + course.getId() + "/publish/" + publish.getSemester() + publish.getClassNumber() + "班/" +
                     assignment.getId() + "/" + file.getOriginalFilename();
 
@@ -119,7 +119,7 @@ public class CourseServiceImpl implements CourseService {
         }
         String path = assignment.getRequirementFilePath();
         String fromPath = path.substring(0, path.lastIndexOf("/")) + "/uploads";
-        if(!new File(fromPath).exists()){
+        if (!new File(fromPath).exists()) {
             return null;
         }
 //        String toPath = path.substring(0, path.lastIndexOf("/")) + "/assignments.zip";
@@ -225,21 +225,21 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage courseList(String teacherId) {
-        List<Course> courseList = courseRepository.findByTeacherAndApproved(new User(teacherId),true);
+        List<Course> courseList = courseRepository.findByTeacherAndApproved(new User(teacherId), true);
         return StatusMessage.getSuccess.setData(courseList);
     }
 
     @Override
     public ResponseMessage publishList(String teacherId) {
-        List<Publish> publishList = publishRepository.findByTeacherAndApprovedOrderByIdDesc(new User(teacherId),true);
+        List<Publish> publishList = publishRepository.findByTeacherAndApprovedOrderByIdDesc(new User(teacherId), true);
         return StatusMessage.getSuccess.setData(publishList);
     }
 
     @Override
     public ResponseMessage publishList(String teacherId, String semester) {
         List<Publish> publishList = publishRepository.findByTeacherAndSemesterOrderByIdDesc(new User(teacherId), semester);
-        for(int i=0;i<publishList.size();i++){
-            if(!publishList.get(i).isApproved()){
+        for (int i = 0; i < publishList.size(); i++) {
+            if (!publishList.get(i).isApproved()) {
                 publishList.remove(i);
                 i--;
             }
@@ -250,9 +250,9 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public ResponseMessage publishList(String teacherId, long courseId) {
         Course course = detectService.detectCourse(teacherId, courseId);
-        ArrayList<Publish> list=new ArrayList<>(course.getPublishList());
-        for(int i=0;i<list.size();i++){
-            if(!list.get(i).isApproved()){
+        ArrayList<Publish> list = new ArrayList<>(course.getPublishList());
+        for (int i = 0; i < list.size(); i++) {
+            if (!list.get(i).isApproved()) {
                 list.remove(i);
                 i--;
             }
@@ -274,16 +274,35 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage electiveCourse(String studentId, long publishId) {
-        Publish publish=publishRepository.findById(publishId).get();
+        Publish publish = publishRepository.findById(publishId).get();
+        List<Election> elections = electionRepository.findByStudentAndPublish(new User(studentId), new Publish(publishId));
+        if (elections.size() > 0) {
+            Election election=elections.get(0);
+            if(election.isWithdraw()){
+                if (publish.getCurrentStudentNumber() < publish.getMaxStudentNumber()) {
+                    election.setWithdraw(false);
+                    electionRepository.save(election);
+                    publish.setCurrentStudentNumber(publish.getCurrentStudentNumber()+1);
+                    publishRepository.save(publish);
+                    return StatusMessage.electiveSuccess;
+                } else {
+                    return StatusMessage.reachLimit;
+                }
+            }else {
+                return StatusMessage.alreadyElectived;
+            }
+        }
         if (!publish.isCutOffed()) {
             UndistributedElection election = new UndistributedElection(new Publish(publishId), new User(studentId));
             undistributedRepository.save(election);
-            return StatusMessage.electiveSeccessWait;
-        }else if (publish.getCurrentStudentNumber()<publish.getMaxStudentNumber()){
-            Election election=new Election(new Publish(publishId),new User(studentId),false);
+            return StatusMessage.electiveSuccessWait;
+        } else if (publish.getCurrentStudentNumber() < publish.getMaxStudentNumber()) {
+            Election election = new Election(new Publish(publishId), new User(studentId), false);
             electionRepository.save(election);
-            return StatusMessage.electiveSeccess;
-        }else{
+            publish.setCurrentStudentNumber(publish.getCurrentStudentNumber()+1);
+            publishRepository.save(publish);
+            return StatusMessage.electiveSuccess;
+        } else {
             return StatusMessage.reachLimit;
         }
     }
@@ -291,12 +310,15 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public ResponseMessage withdrawCourse(String studentId, long publishId) {
         List<Election> elections = electionRepository.findByStudentAndPublish(new User(studentId), new Publish(publishId));
-        if (elections.size() > 1) {
-            return StatusMessage.IOExceptionOccurs;
+        if (elections.size() > 1 || elections.size() == 0) {
+            return StatusMessage.notExist;
         }
         Election election = elections.get(0);
         election.setWithdraw(true);
         electionRepository.save(election);
+        Publish publish=publishRepository.findById(publishId).get();
+        publish.setCurrentStudentNumber(publish.getCurrentStudentNumber()-1);
+        publishRepository.save(publish);
         return StatusMessage.withdrawSuccess;
     }
 
@@ -333,7 +355,7 @@ public class CourseServiceImpl implements CourseService {
                 return StatusMessage.notElectived;
             }
 
-            String filename = studentId + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".") + 1);
+            String filename = studentId + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
             String filePath = Util.getStaticPath() + "/" + course.getId() + "/publish/" + publish.getSemester() + publish.getClassNumber() + "班/" +
                     assignment.getId() + "/uploads/" + filename;
             Util.saveFile(file, filePath);
@@ -346,10 +368,22 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public ResponseMessage getUploadedAssignment(String studentId, long assignmentId){
+        Optional<UploadAssignment> opt=uploadAssignmentRepository.findByStudentAndAssignment(new User(studentId), new Assignment(assignmentId));
+        if (opt.isPresent()){
+            return StatusMessage.getSuccess.setData(opt.get());
+        }else{
+            return StatusMessage.notExist;
+        }
+    }
+
+    @Override
     public ResponseMessage electivedCourseList(String studentId) {
         List<Election> electionList = electionRepository.findByStudent(new User(studentId));
         ArrayList<Publish> publishList = new ArrayList<>();
         for (Election e : electionList) {
+            if(e.isWithdraw())
+                continue;
             publishList.add(e.getPublish());
         }
         return StatusMessage.getSuccess.setData(publishList);
@@ -359,6 +393,24 @@ public class CourseServiceImpl implements CourseService {
     public ResponseMessage allPublishList(String studentId) {
         List<Publish> publishList = publishRepository.findBySemesterOrderByIdDesc(semester);
         return StatusMessage.getSuccess.setData(publishList);
+    }
+
+    @Override
+    public ResponseMessage selected(String studentId, long publishId) {
+        List<Election> elections = electionRepository.findByStudentAndPublish(new User(studentId), new Publish(publishId));
+        List<UndistributedElection> undistributedElections = undistributedRepository.findByStudentAndPublish(new User(studentId), new Publish(publishId));
+        if (elections.size() == 0 && undistributedElections.size() == 0)
+            return StatusMessage.notElectived;
+        else if (undistributedElections.size() == 1 && elections.size() == 0)
+            return StatusMessage.notCutOffed;
+        else if (undistributedElections.size() == 0 && elections.size() == 1) {
+            if (elections.get(0).isWithdraw()){
+                return StatusMessage.notElectived;
+            }
+            return StatusMessage.electived;
+        }
+        else
+            return StatusMessage.fail;
     }
 
     @Override
@@ -391,27 +443,33 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage cutOffElection(long publishId) {
-        List<UndistributedElection> undistributedElectionList = undistributedRepository.findByPublish(new Publish(publishId));
-        ArrayList<Election> elections = new ArrayList<>();
         Publish publish=publishRepository.findById(publishId).get();
-        int max=publish.getMaxStudentNumber();
-        if(undistributedElectionList.size()<=max) {
+        if (publish.isCutOffed()){
+            return StatusMessage.fail;
+        }
+        List<UndistributedElection> undistributedElectionList = undistributedRepository.findByPublish(publish);
+        ArrayList<Election> elections = new ArrayList<>();
+        int max = publish.getMaxStudentNumber();
+        if (undistributedElectionList.size() <= max) {
             for (UndistributedElection u : undistributedElectionList) {
                 elections.add(new Election(u));
             }
-        }else{
-            Random random=new Random();
-            HashSet<Integer> set=new HashSet<>();
+        } else {
+            Random random = new Random();
+            HashSet<Integer> set = new HashSet<>();
             do {
                 set.add(random.nextInt(undistributedElectionList.size()));
             } while (set.size() < max);
 
-            for(Integer i:set){
+            for (Integer i : set) {
                 elections.add(new Election(undistributedElectionList.get(i)));
             }
         }
         electionRepository.saveAll(elections);
         undistributedRepository.deleteAll(undistributedElectionList);
+        publish.setCurrentStudentNumber(elections.size());
+        publish.setCutOffed(true);
+        publishRepository.save(publish);
         return StatusMessage.cutOffSuccess;
     }
 

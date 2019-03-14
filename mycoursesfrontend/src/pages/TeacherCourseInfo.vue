@@ -21,7 +21,7 @@
         <el-card shadow="always">
           <router-button v-bind:path="'/teacher/createPublish'">发布新学期</router-button>
           <button-item v-on:click="dialogVisible = true">发布课件</button-item>
-          <button-item v-on:click="goBack">返回</button-item>
+          <button-item v-on:click="goBack()">返回</button-item>
         </el-card>
       </el-col>
     </el-row>
@@ -91,9 +91,6 @@
       }
     },
     methods: {
-      goBack() {
-        this.$router.go(-1);
-      },
       handleChange(file, fileList) {
         this.handoutForm.file = file.raw;
         if (fileList.length > 1) {

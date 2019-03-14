@@ -24,7 +24,26 @@ export default new Router({
         {
           path: 'student',
           name: 'student',
-          component: () => import('../pages/Student')
+          component: () => import('../pages/Student'),
+          children:[
+            {
+              path:"home",
+              name:"studentHome",
+              component:()=>import('../components/student/StudentHome')
+            },{
+              path:"allPublishList",
+              name:"studentElectiveList",
+              component:()=>import('../components/student/allPublishList')
+            },
+          ]
+        },{
+          path:'student/publishInfo',
+          name:'studentPublishInfo',
+          component:()=>import('../pages/StudentPublishInfo')
+        },{
+          path:'student/assignmentInfo',
+          name:'studentAssignmentInfo',
+          component:()=>import('../pages/StudentAssignmentInfo')
         },
         {
           path: 'teacher',

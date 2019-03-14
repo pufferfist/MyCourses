@@ -5,6 +5,10 @@
         <el-row>
           <assignment-info v-bind:assignment="assignment"></assignment-info>
         </el-row>
+        <el-row class="pt3">
+          <grade-table v-if="showGradeTable"
+                       v-bind:grade-data="gradeData"></grade-table>
+        </el-row>
       </el-col>
       <el-col :span="8">
         <el-card shadow="always">
@@ -40,57 +44,93 @@
 </template>
 
 <script>
-    import AssignmentInfo from "../components/util/AssignmentInfo";
-    import ButtonItem from "../components/util/ButtonItem";
-    export default {
-        name: "TeacherAssignmentInfo",
-      components: {ButtonItem, AssignmentInfo},
-      data(){
-          return{
-            gradeDialog:false,
-            file:{}
+  import AssignmentInfo from "../components/util/AssignmentInfo";
+  import ButtonItem from "../components/util/ButtonItem";
+  import GradeTable from "../components/util/GradeTable";
+
+  export default {
+    name: "TeacherAssignmentInfo",
+    components: {GradeTable, ButtonItem, AssignmentInfo},
+    data() {
+      return {
+        gradeDialog: false,
+        file: {},
+        gradeData: [],
+        showGradeTable: false
+      }
+    },
+    computed: {
+      assignment() {
+        return this.$store.state.assignment;
+      }
+    },
+    methods: {
+      downloadAssignment() {
+        this.axios({
+          method:'post',
+          url:'/backend/downloadAssignment',
+          responseType:'blob',
+          data:{
+            assignmentId:this.assignment.id
           }
+        }).then(res => {
+          let a = document.createElement('a');
+          let blob=new Blob([res.data],{type:"application/zip"});
+          let url = window.URL.createObjectURL(blob);
+          let filename = res.headers["content-disposition"].split("=")[1];
+          a.href = url;
+          a.download = filename;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          }
+        )
       },
-      computed: {
-        assignment() {
-          return this.$store.state.assignment;
+      publishAssignmentGrades() {
+        if(this.isEmptyObject(this.file)){
+          this.$message.warning("必须选择一个文件");
+          return
+        }
+        let formData = new FormData();
+        formData.append("assignmentId", this.assignment.id);
+        formData.append("file", this.file);
+        this.axios.post("/backend/publishAssignmentGrades", formData)
+          .then(res => {
+            if (res.data.code === 0) {
+              this.gradeDialog = false;
+              this.$Message.success({
+                content: "上传成功",
+                duration: 1
+              });
+            } else {
+              this.$Message.error({
+                content: res.data.msg,
+                duration: 1
+              });
+            }
+          })
+      },
+      handleChange(file, fileList) {
+        this.file = file.raw;
+        if (fileList.length > 1) {
+          fileList.shift()
         }
       },
-      methods:{
-        downloadAssignment(){
-
-        },
-        publishAssignmentGrades(){
-          let formData=new FormData();
-          formData.append("assignmentId",this.assignment.id);
-          formData.append("file",this.file);
-          this.axios.post("/backend/publishAssignmentGrades",formData)
-            .then(res=>{
-              if (res.data.code===0){
-                this.gradeDialog = false;
-                this.$Message.success({
-                  content: "上传成功",
-                  duration: 1
-                });
-              }else{
-                this.$Message.error({
-                  content: res.data.msg,
-                  duration: 1
-                });
-              }
-            })
-        },
-        handleChange(file, fileList) {
-          this.file = file.raw;
-          if (fileList.length > 1) {
-            fileList.shift()
-          }
-        },
-        handleRemove(file, fileList){
-          this.file={}
-        },
-      }
+      showGrade() {
+        if (this.showGradeTable) {
+          this.showGradeTable=false;
+          return
+        }
+        this.axios.post("/backend/getAssignmentGrade", {assignmentId: this.assignment.id})
+          .then(res => {
+              this.gradeData = this.processCSV(res.data);
+              this.showGradeTable = true;
+          })
+      },
+      handleRemove(file, fileList) {
+        this.file = {}
+      },
     }
+  }
 </script>
 
 <style scoped>

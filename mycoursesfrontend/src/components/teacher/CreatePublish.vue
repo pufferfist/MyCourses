@@ -68,7 +68,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">立即创建</el-button>
-        <el-button @click="goBack">取消</el-button>
+        <el-button @click="goBack()">取消</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -164,9 +164,6 @@
               this.$Message.error("课程创建出现错误");
             }
           })
-      },
-      goBack() {
-        this.$router.go(-1);
       }
     }
   }

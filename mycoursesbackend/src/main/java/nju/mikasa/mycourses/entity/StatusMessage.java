@@ -31,8 +31,8 @@ public class StatusMessage {
     public static ResponseMessage IOExceptionOccurs = new ResponseMessage(5001, "IOException occurs");
     public static ResponseMessage fileIsNull = new ResponseMessage(5002, "File do not exist");
     public static ResponseMessage fileFormatWrong=new ResponseMessage(5003,"File is no csv");
-    public static ResponseMessage withdrawSuccess=new ResponseMessage(5004,"Quit course success");
-    public static ResponseMessage notElectived=new ResponseMessage(5005,"Not elective");
+    public static ResponseMessage withdrawSuccess=new ResponseMessage(0,"Quit course success");
+
 
     public static ResponseMessage getSuccess=new ResponseMessage(0,"Get stuff success");
     public static ResponseMessage createSuccess=new ResponseMessage(0,"Create entity success");
@@ -43,7 +43,14 @@ public class StatusMessage {
     public static ResponseMessage cutOffSuccess=new ResponseMessage(0,"Publish cut off success");
     public static ResponseMessage approveSuccess=new ResponseMessage(0,"Approve success");
 
-    public static ResponseMessage electiveSeccess=new ResponseMessage(0,"elective in the class directly");
-    public static ResponseMessage electiveSeccessWait=new ResponseMessage(1,"wait to cut off");
+    public static ResponseMessage electiveSuccess =new ResponseMessage(0,"elective in the class directly");
+    public static ResponseMessage electiveSuccessWait =new ResponseMessage(1,"wait to cut off");
     public static ResponseMessage reachLimit=new ResponseMessage(7001,"reach the upper limit");
+    public static ResponseMessage alreadyElectived =new ResponseMessage(7002,"already Electived");
+
+    public static ResponseMessage electived=new ResponseMessage(0,"electived");
+    public static ResponseMessage notElectived=new ResponseMessage(5005,"Not elective");
+    public static ResponseMessage notCutOffed=new ResponseMessage(5006,"not cut offed");
+
+    public static ResponseMessage fail=new ResponseMessage(9999,"something goes wrong");
 }

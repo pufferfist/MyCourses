@@ -16,7 +16,7 @@
     <el-col :span="8">
       <el-card shadow="always">
         <button-item v-if="!course.approved" v-on:click="approve">通过审批</button-item>
-        <button-item v-on:click="goBack">返回</button-item>
+        <button-item v-on:click="goBack()">返回</button-item>
       </el-card>
     </el-col>
   </el-row>
@@ -62,9 +62,6 @@
               this.$message.warning("审批失败");
             }
           })
-      },
-      goBack() {
-        this.$router.go(-1);
       }
     }
   }

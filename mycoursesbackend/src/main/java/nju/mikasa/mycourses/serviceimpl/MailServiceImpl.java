@@ -51,7 +51,7 @@ public class MailServiceImpl implements MailService {
             messageHelper = new MimeMessageHelper(message, true);
             messageHelper.setFrom(from);
             messageHelper.setTo(to);
-            messageHelper.setSubject(text);
+            messageHelper.setSubject(title);
             messageHelper.setText(text);
             javaMailSender.send(message);
         } catch (MessagingException e) {

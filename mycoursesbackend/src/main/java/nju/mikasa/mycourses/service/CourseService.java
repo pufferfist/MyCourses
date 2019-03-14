@@ -14,7 +14,7 @@ public interface CourseService {
 
     ResponseMessage createCourse(String name, String teacherId, String description);
 
-    ResponseMessage publishCourse(long courseId, String teacherId, String semester, int classHours,int classOrder, int dayOfWeek,
+    ResponseMessage publishCourse(long courseId, String teacherId, String semester, int classHours, int classOrder, int dayOfWeek,
                                   int startWeek, int weekNumber, String classroom, int maxStudentNumber, int classNumber);
 
     ResponseMessage uploadHandout(String teacherId, long courseId, String name, MultipartFile file);
@@ -55,12 +55,14 @@ public interface CourseService {
 
     ResponseMessage uploadAssignment(String studentId, long assignmentId, MultipartFile file);
 
-//    ResponseMessage downloadOwnAssignment(String studentId, long assignmentId);
+    ResponseMessage getUploadedAssignment(String studentId, long assignmentId);
 
     //已选列表
     ResponseMessage electivedCourseList(String studentId);
 
     ResponseMessage allPublishList(String studentId);
+
+    ResponseMessage selected(String studentId, long publishId);
 
     String getAssignmentGrade(String studentId, long assignmentId);
 

@@ -46,6 +46,11 @@ public class CourseController {
                publishId,name,description,deadline,file);
     }
 
+    @PostMapping("getUploadedAssignment")
+    public ResponseMessage getUploadedAssignment(@RequestBody Map<String, Object> params){
+        return courseService.getUploadedAssignment(session.getAttribute("username").toString(),
+                Long.parseLong(params.get("assignmentId").toString()));
+    }
 
     @PostMapping("publishAssignmentGrades")
     public ResponseMessage publishAssignmentGrades(long assignmentId,MultipartFile file) {
@@ -53,9 +58,8 @@ public class CourseController {
     }
 
     @PostMapping("publishCourseGrades")
-    public ResponseMessage publishCourseGrades(@RequestBody Map<String, Object> params) {
-        return courseService.publishCourseGrades(session.getAttribute("username").toString(),
-                Long.parseLong(params.get("publishId").toString()), (MultipartFile) params.get("file"));
+    public ResponseMessage publishCourseGrades(long publishId,MultipartFile file) {
+        return courseService.publishCourseGrades(session.getAttribute("username").toString(),publishId,file);
     }
 
     @PostMapping("groupEmail")
@@ -99,15 +103,14 @@ public class CourseController {
 
     @PostMapping("withdrawCourse")
     public ResponseMessage withdrawCourse(@RequestBody Map<String, Object> params) {
-//        return courseService.withdrawCourse(session.getAttribute("username").toString(),
-//                Long.parseLong(params.get("publishId").toString()));
-        return courseService.withdrawCourse(Long.parseLong(params.get("electionId").toString()));
+        return courseService.withdrawCourse(session.getAttribute("username").toString(),
+                Long.parseLong(params.get("publishId").toString()));
+//        return courseService.withdrawCourse(Long.parseLong(params.get("electionId").toString()));
     }
 
     @PostMapping("uploadAssignment")
-    public ResponseMessage uploadAssignment(@RequestBody Map<String, Object> params) {
-        return courseService.uploadAssignment(session.getAttribute("username").toString(),
-                Long.parseLong(params.get("assignmentId").toString()),(MultipartFile) params.get("file"));
+    public ResponseMessage uploadAssignment(long assignmentId,MultipartFile file) {
+        return courseService.uploadAssignment(session.getAttribute("username").toString(),assignmentId,file);
     }
 
     @PostMapping("electivedCourseList")
@@ -118,6 +121,12 @@ public class CourseController {
     @PostMapping("allPublishList")
     public ResponseMessage allPublishList() {
         return courseService.allPublishList(session.getAttribute("username").toString());
+    }
+
+    @PostMapping("selected")
+    public ResponseMessage selected(@RequestBody Map<String, Object> params) {
+        return courseService.selected(session.getAttribute("username").toString(),
+                Long.parseLong(params.get("publishId").toString()));
     }
 
     /*------------------------administrator part-----------------------*/
