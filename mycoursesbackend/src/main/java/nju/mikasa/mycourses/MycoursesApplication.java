@@ -5,7 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
-@ServletComponentScan("nju.mikasa.mycourses.filter")
+@ServletComponentScan({"nju.mikasa.mycourses.filter","nju.mikasa.mycourses.listener"})
+
 public class MycoursesApplication {
 
     public static void main(String[] args) {

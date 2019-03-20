@@ -44,7 +44,7 @@ public class CounterListener implements ServletContextListener,
     public void sessionDestroyed(HttpSessionEvent se) {
         /* Session is destroyed. */
         HttpSession session = se.getSession();
-        Object attr = session.getAttribute("username");
+        Object attr = session.getAttribute("user");
         if (attr != null) {
             Type type = ((User) attr).getType();
             if (type == Type.STUDENT) {
@@ -63,7 +63,7 @@ public class CounterListener implements ServletContextListener,
       /* This method is called when an attribute 
          is added to a session.
       */
-        if (sbe.getName().equals("username")) {
+        if (sbe.getName().equals("user")) {
             Type type = ((User) sbe.getValue()).getType();
             if (type == Type.STUDENT) {
                 counter.setStudentNum(counter.getStudentNum() + 1);

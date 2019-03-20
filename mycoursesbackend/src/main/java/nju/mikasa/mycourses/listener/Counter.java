@@ -21,4 +21,5 @@ public class Counter {
         studentNum=0;
         historyVisitNum=0;
     }
+
 }

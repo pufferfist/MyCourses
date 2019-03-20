@@ -31,7 +31,8 @@ public class UserController {
     public ResponseMessage login(@RequestBody Map<String, Object> params){
         ResponseMessage res=userService.login(params.get("username").toString(),params.get("password").toString());
         if (res.getCode()==0){
-            request.getSession(true).setAttribute("username",res.getData());
+            request.getSession(true).setAttribute("username",params.get("username").toString());
+            request.getSession(true).setAttribute("user",res.getData());
         }
         return res;
     }
