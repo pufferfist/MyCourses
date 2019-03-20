@@ -16,11 +16,16 @@
             <semester-publish-list v-bind:publish-list="publishList"></semester-publish-list>
           </el-card>
         </el-row>
+        <el-row class="pt3">
+          <post-module v-if="postModule"></post-module>
+        </el-row>
       </el-col>
       <el-col :span="8">
         <el-card shadow="always">
           <router-button v-bind:path="'/teacher/createPublish'">发布新学期</router-button>
           <button-item v-on:click="dialogVisible = true">发布课件</button-item>
+          <button-item v-if="!postModule" v-on:click="postModule = true">查看论坛</button-item>
+          <button-item v-if="postModule" v-on:click="postModule = false">关闭论坛</button-item>
           <button-item v-on:click="goBack()">返回</button-item>
         </el-card>
       </el-col>
@@ -59,10 +64,11 @@
   import CourseInfo from "../components/util/CourseInfo";
   import HandoutList from "../components/util/HandoutList";
   import SemesterPublishList from "../components/util/SemesterPublishList";
+  import PostModule from "../components/util/PostModule";
 
   export default {
     name: "TeacherCourseInfo",
-    components: {SemesterPublishList, HandoutList, CourseInfo, PublishList, RouterButton, ButtonItem},
+    components: {PostModule, SemesterPublishList, HandoutList, CourseInfo, PublishList, RouterButton, ButtonItem},
     beforeCreate: function () {
      this.axios.post("/backend/coursePublishList",{courseId:this.$store.state.course.id})
        .then(res=>{
@@ -82,7 +88,8 @@
           file: {}
         },
         change: false,
-        publishList: []
+        publishList: [],
+        postModule:false
       }
     },
     computed: {

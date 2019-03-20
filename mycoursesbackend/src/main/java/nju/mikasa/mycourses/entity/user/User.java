@@ -1,5 +1,6 @@
 package nju.mikasa.mycourses.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,11 +21,13 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private String studentNumber;
     @Enumerated(EnumType.STRING)
     private Type type;
     private boolean deleted;
 
     private String verifyCode;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Calendar registerTime;
     private boolean activated;
 

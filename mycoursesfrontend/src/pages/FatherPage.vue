@@ -44,7 +44,7 @@
     },
     computed:{
       id(){
-        return this.$store.state.id;
+        return this.$store.state.user.name;
       }
     }
   }

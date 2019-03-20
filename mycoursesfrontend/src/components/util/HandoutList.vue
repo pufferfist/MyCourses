@@ -5,7 +5,7 @@
     </div>
     <a v-for="handout in handoutList"
        :key="handout.id"
-       :href="'http://localhost:8088'+this.getPath(handout.filePath)"
+       :href="'http://localhost:8088'+getPath(handout.filePath)"
        class="pv2 db">{{handout.name}}</a>
   </el-card>
 </template>

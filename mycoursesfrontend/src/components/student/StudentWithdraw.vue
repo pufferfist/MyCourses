@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="always">
     <div slot="header" class="cf f3 tl">
-      <span>课程概览</span>
+      <span>退选课程</span>
     </div>
     <el-card v-for="item in publishList"
              :key="item.id"
@@ -17,23 +17,22 @@
 </template>
 
 <script>
-  import PublishList from "../util/PublishList";
-
-  export default {
-    name: "TeacherHome",
-    components: {PublishList},
-    data() {
-      return {
-        publishList: {},
+    import PublishList from "../util/PublishList";
+    export default {
+        name: "StudentWithdraw",
+      components: {PublishList},
+      data() {
+        return {
+          publishList: {},
+        }
+      },
+      beforeCreate: function () {
+        this.axios.post("/backend/withDrawCourseList")
+          .then((res) => {
+            this.publishList = res.data.data;
+          })
       }
-    },
-    beforeCreate: function () {
-      this.axios.post("/backend/publishList")
-        .then((res) => {
-          this.publishList = res.data.data;
-        })
     }
-  }
 </script>
 
 <style scoped>

@@ -22,13 +22,16 @@ public class MailServiceImpl implements MailService {
     private static final String sep = System.lineSeparator();
 
     @Override
+    @Async
     public void sendVerifyEmail(User user) {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper messageHelper;
         StringBuilder sb = new StringBuilder("<p>请点击以下链接激活账号</p>" + sep);
-        sb.append("<a target=\"_blank\" href=http://");
+        sb.append("<a target=\"_blank\" href=http://localhost:8088/user/verify?username=");
+        sb.append(user.getId());
+        sb.append("&verifyCode=");
         sb.append(user.getVerifyCode());
-        sb.append(">点此激活</a>");
+        sb.append(" >点此激活</a>");
         try {
             messageHelper = new MimeMessageHelper(message, true);
             messageHelper.setFrom(from);

@@ -1,5 +1,7 @@
 package nju.mikasa.mycourses.entity.bbs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,12 +31,15 @@ public class Post {
     @JoinColumn(name = "userId")
     private User user;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "post")
     @OrderBy(value = "time asc")
     private Set<FollowUp> followUpList;
 
     private String title;
+    @Column(name = "postText",columnDefinition="TEXT")
     private String text;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Calendar time;
 
     public Post(Course course, User user, String title, String text, Calendar time) {

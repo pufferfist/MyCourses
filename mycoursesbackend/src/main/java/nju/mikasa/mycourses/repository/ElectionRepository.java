@@ -13,4 +13,6 @@ public interface ElectionRepository extends JpaRepository<Election,Long> {
     List<Election> findByStudentAndPublish(User student, Publish publish);
     List<Election> findByStudent(User student);
     List<Election> findByPublish(Publish publish);
+
+
 }

@@ -18,6 +18,7 @@
           <button-item v-on:click="homeworkDialog=true">发布作业</button-item>
           <button-item v-on:click="gradeDialog=true">发布成绩</button-item>
           <button-item v-if="publish.gradesFilePath!==null" v-on:click="showGrade">查看成绩</button-item>
+          <button-item v-on:click="showStudentDialog">选课名单</button-item>
           <button-item v-on:click="mailDialog=true">群发邮件</button-item>
           <button-item v-on:click="goBack()">返回</button-item>
         </el-card>
@@ -104,6 +105,12 @@
         <el-button type="primary" @click="groupEmail">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="选课名单" :visible.sync="this.studentDialog">
+      <student-list v-bind:student-list="studentList"></student-list>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="studentDialog = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -112,10 +119,11 @@
   import ButtonItem from "../components/util/ButtonItem";
   import AssignmentList from "../components/util/AssignmentList";
   import GradeTable from "../components/util/GradeTable";
+  import StudentList from "../components/util/StudentList";
 
   export default {
     name: "TeacherPublishInfo",
-    components: {GradeTable, AssignmentList, ButtonItem, PublishInfo},
+    components: {StudentList, GradeTable, AssignmentList, ButtonItem, PublishInfo},
     data() {
       return {
         homeworkDialog: false,
@@ -136,7 +144,9 @@
         mailForm:{
           title:"",
           text:""
-        }
+        },
+        studentDialog:false,
+        studentList:[],
       }
     },
     computed: {
@@ -145,6 +155,13 @@
       }
     },
     methods: {
+      showStudentDialog(){
+        this.axios.post("/backend/publishStudents",{publishId:this.$store.state.publish.id})
+          .then(res=>{
+            this.studentList=res.data.data;
+            this.studentDialog=true
+          });
+      },
       homeworkChange(file, fileList) {
         this.homeworkForm.file = file.raw;
         if (fileList.length > 1) {

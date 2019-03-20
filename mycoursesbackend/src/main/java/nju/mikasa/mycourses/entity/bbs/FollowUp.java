@@ -1,5 +1,7 @@
 package nju.mikasa.mycourses.entity.bbs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,7 @@ public class FollowUp {
     @GeneratedValue
     long id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "postId")
     private Post post;
@@ -26,7 +29,9 @@ public class FollowUp {
     @JoinColumn(name = "userId")
     private User user;
 
+    @Column(name = "postText",columnDefinition="TEXT")
     private String text;
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Calendar time;
 
     public FollowUp(Post post, User user, String text, Calendar time) {

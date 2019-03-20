@@ -14,6 +14,7 @@
         <el-card shadow="always">
           <button-item v-on:click="downloadAssignment">下载作业</button-item>
           <button-item v-on:click="gradeDialog=true">发布成绩</button-item>
+          <button-item v-on:click="showStudentDialog">提交列表</button-item>
           <button-item v-if="assignment.gradesFilePath!==null" v-on:click="showGrade">查看成绩</button-item>
           <button-item v-on:click="goBack()">返回</button-item>
         </el-card>
@@ -40,6 +41,12 @@
         <el-button type="primary" @click="publishAssignmentGrades">确 定</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="提交列表" :visible.sync="this.studentDialog">
+      <student-list v-bind:student-list="studentList"></student-list>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="studentDialog = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -47,16 +54,19 @@
   import AssignmentInfo from "../components/util/AssignmentInfo";
   import ButtonItem from "../components/util/ButtonItem";
   import GradeTable from "../components/util/GradeTable";
+  import StudentList from "../components/util/StudentList";
 
   export default {
     name: "TeacherAssignmentInfo",
-    components: {GradeTable, ButtonItem, AssignmentInfo},
+    components: {StudentList, GradeTable, ButtonItem, AssignmentInfo},
     data() {
       return {
         gradeDialog: false,
+        studentDialog:false,
         file: {},
         gradeData: [],
-        showGradeTable: false
+        showGradeTable: false,
+        studentList:[]
       }
     },
     computed: {
@@ -65,6 +75,13 @@
       }
     },
     methods: {
+      showStudentDialog(){
+        this.axios.post("/backend/assignmentStudents",{assignmentId:this.$store.state.assignment.id})
+          .then(res=>{
+            this.studentList=res.data.data;
+            this.studentDialog=true
+          });
+      },
       downloadAssignment() {
         this.axios({
           method:'post',

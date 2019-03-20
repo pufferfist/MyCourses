@@ -10,7 +10,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -20,12 +22,16 @@ public class UserController {
     private UserService userService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private HttpServletResponse response;
+    @Autowired
+    private HttpSession session;
 
     @PostMapping("login")
     public ResponseMessage login(@RequestBody Map<String, Object> params){
         ResponseMessage res=userService.login(params.get("username").toString(),params.get("password").toString());
         if (res.getCode()==0){
-            request.getSession(true).setAttribute("username",params.get("username").toString());
+            request.getSession(true).setAttribute("username",res.getData());
         }
         return res;
     }
@@ -35,9 +41,20 @@ public class UserController {
         return userService.signUp(params.get("username").toString(),params.get("password").toString(),params.get("name").toString());
     }
 
-    @PostMapping("verify")
-    public ResponseMessage verify(@RequestBody Map<String, Object> params){
-        return userService.verify(params.get("username").toString(),params.get("verifyCode").toString());
+    @GetMapping("verify")
+    public String verify(@RequestParam String username,@RequestParam String verifyCode) throws IOException {
+        ResponseMessage responseMessage=userService.verify(username, verifyCode);
+        if(responseMessage.getCode()==0) {
+            response.sendRedirect("http://localhost:8087/verifySuccess");
+            return "";
+        }else {
+            return "验证失败";
+        }
+    }
+
+    @PostMapping("modify")
+    public ResponseMessage modify(@RequestBody Map<String, Object> params){
+        return userService.modify(session.getAttribute("username").toString(),params);
     }
 
     @PostMapping("info")
@@ -46,13 +63,14 @@ public class UserController {
     }
 
     @PostMapping("delete")
-    public ResponseMessage deleteUser(@RequestBody Map<String, Object> params){
-        return userService.deleteUser(params.get("username").toString());
+    public ResponseMessage deleteUser(){
+        return userService.deleteUser(session.getAttribute("username").toString());
     }
 
     @PostMapping("logout")
-    public ResponseMessage deleteUser(){
+    public ResponseMessage logout(){
         request.getSession().invalidate();
         return StatusMessage.logoutSuccess;
     }
+
 }

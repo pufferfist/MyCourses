@@ -120,6 +120,12 @@
                 content: "上传成功",
                 duration: 1
               });
+              this.axios.post("/backend/getUploadedAssignment", {assignmentId: this.$store.state.assignment.id})
+                .then(res => {
+                  if (res.data.code === 0) {
+                    this.uploadAssignment = res.data.data;
+                  }
+                })
             } else {
               this.$Message.error({
                 content: res.data.msg,

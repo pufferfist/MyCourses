@@ -34,13 +34,15 @@ public interface CourseService {
 
     ResponseMessage publishList(String teacherId);
 
-    ResponseMessage publishList(String teacherId, String semester);
-
     ResponseMessage publishList(String teacherId, long courseId);
 
     ResponseMessage handoutList(long courseId);
 
     ResponseMessage assignmentList(long publishId);
+
+    ResponseMessage assignmentStudents(long assignmentId);
+
+    ResponseMessage publishStudents(long publishId);
 
 
     /**
@@ -68,6 +70,9 @@ public interface CourseService {
 
     String getCourseGrade(String studentId, long publishId);
 
+    ResponseMessage withDrawCourseList(String studentId);
+
+    ResponseMessage teacherPublishList(String studentId, String teacherId);
 
     /**
      * administrator part
@@ -84,4 +89,10 @@ public interface CourseService {
     ResponseMessage getToBeApprovePublish();
 
     ResponseMessage getToBeCutOffPublish();
+
+    ResponseMessage newSemester(String semester);
+
+    ResponseMessage getCurrentSemester();
+
+    ResponseMessage getStatistic();
 }

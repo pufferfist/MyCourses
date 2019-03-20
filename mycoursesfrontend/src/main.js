@@ -30,7 +30,7 @@ Vue.use(util);
 Vue.config.productionTip = false;
 
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login' || to.path === '/signup') {
+  if (to.path === '/login' || to.path === '/signUp' || to.path === '/verifySuccess') {
     next();
   } else {
     axios.post('/backend/auth')
@@ -47,11 +47,12 @@ router.beforeEach((to, from, next) => {
 
 const store = new Vuex.Store({
   state: {
-    id: "",
     type: "",
+    user: {},
     course: {},
     publish: {},
-    assignment: {}
+    assignment: {},
+    post: {}
   },
   mutations: {
     set(state, payload) {
@@ -61,13 +62,14 @@ const store = new Vuex.Store({
         state.publish = payload.data;
       } else if (payload.type === "assignment") {
         state.assignment = payload.data;
+      } else if (payload.type === "post") {
+        state.post = payload.data;
+      } else if (payload.type === "user") {
+        state.user = payload.data;
       }
     },
     type(state, payload) {
       state.type = payload
-    },
-    id(state, payload) {
-      state.id = payload;
     }
   },
   plugins: [vuexAlong]

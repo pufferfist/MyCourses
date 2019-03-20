@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private MailService mailService;
 
-    private String studentPattern = "^[0-9a-zA-Z]+@smail.nju.edu.cn$";
+    private String studentPattern = "^[0-9a-zA-Z]+@163.com$";
     private String teacherPattern = "^[0-9a-zA-Z]+@nju.edu.cn$";
 
     @Override
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
             if (user.get().isDeleted())
                 return StatusMessage.userIsDeleted;
             if (user.get().getPassword().equals(encrypt(password)))
-                return StatusMessage.loginSuccess.setData(user);
+                return StatusMessage.loginSuccess.setData(user.get());
             else
                 return StatusMessage.incorrectPassword;
         } else
@@ -47,21 +48,26 @@ public class UserServiceImpl implements UserService {
         Optional<User> opt = userRepository.findById(id);
 
         if (opt.isPresent()) {
-            long differ = (Calendar.getInstance().getTimeInMillis() - opt.get().getRegisterTime().getTimeInMillis()) / (1000 * 3600 * 24);
-            if (differ < 1) {
-                return StatusMessage.userAlreadyExist;
+            if (!opt.get().isDeleted()) {
+                long differ = (Calendar.getInstance().getTimeInMillis() - opt.get().getRegisterTime().getTimeInMillis()) / (1000 * 3600 * 24);
+                if (differ < 1 || opt.get().isActivated()) {
+                    return StatusMessage.userAlreadyExist;
+                }
             }
         }
 
-        Type type;
-        if (Pattern.matches(studentPattern, id))
-            type = Type.STUDENT;
+        User user = new User(id, name, id, encrypt(password), null, null, false, new Md5Hash(id, null).toString(), Calendar.getInstance(), false);
+
+        if (Pattern.matches(studentPattern, id)) {
+            user.setType(Type.STUDENT);
+            user.setStudentNumber(user.getId().substring(0,user.getId().indexOf("@")));
+        }
         else if (Pattern.matches(teacherPattern, id))
-            type = Type.TEACHER;
+            user.setType(Type.TEACHER);
         else
             return StatusMessage.emailFormatError;
 
-        User user = new User(id, name, id, encrypt(password), type, false, new Md5Hash(id, null).toString(), Calendar.getInstance(), false);
+
         userRepository.save(user);
         mailService.sendVerifyEmail(user);
         return StatusMessage.signUpSuccess;
@@ -96,6 +102,20 @@ public class UserServiceImpl implements UserService {
             return StatusMessage.unknownUsername;
         else
             return StatusMessage.getSuccess.setData(opt.get());
+    }
+
+    @Override
+    public ResponseMessage modify(String username, Map<String, Object> params) {
+        User user=userRepository.findById(username).get();
+        if (user.getType()==Type.STUDENT){
+            user.setStudentNumber(params.get("studentNumber").toString());
+            user.setName(params.get("name").toString());
+            userRepository.save(user);
+        }else{
+            user.setName(params.get("name").toString());
+            userRepository.save(user);
+        }
+        return StatusMessage.modifyInfoSuccess;
     }
 
     @Override

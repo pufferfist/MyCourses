@@ -11,7 +11,7 @@
       </i-input>
     </FormItem>
     <FormItem class="tl">
-      <p><span style="color:black">没有帐号? </span><a href="/signUp">注册</a> | <a href="/forgetPassword">忘记密码?</a></p>
+      <p><span style="color:black">没有帐号? </span><router-link to="/signUp">注册</router-link> | <a href="/forgetPassword">忘记密码?</a></p>
     </FormItem>
     <FormItem class="tc">
       <Button id="loginButton" type="primary" @click="handleSubmit()" class="Button">登录</Button>
@@ -72,11 +72,13 @@
                   this.$store.commit("type","admin");
                   this.$router.push("/admin/home")
                 }
-                this.$store.commit("id",user.name)
+                this.$store.commit("set",{type:"user",data:user})
               } else if (response.data.code === 1001) {
                 this.$Message.warning("用户名不存在")
               } else if (response.data.code === 1002) {
                 this.$Message.error("密码错误")
+              }else if (response.data.code === 2001) {
+                this.$Message.error("用户已注销")
               }
             })
             .catch(function (error) {

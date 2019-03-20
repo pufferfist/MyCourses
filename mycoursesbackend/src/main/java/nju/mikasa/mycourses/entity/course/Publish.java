@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "publish")
+@Table(name = "publish",indexes = {@Index(columnList = "semester")})
 public class Publish {
     @GeneratedValue
     @Id

@@ -9,5 +9,5 @@ public interface PostService {
 
     ResponseMessage getPostList(long courseId);
 
-    ResponseMessage getPost(long postId);
+    ResponseMessage getFollowUp(long postId);
 }

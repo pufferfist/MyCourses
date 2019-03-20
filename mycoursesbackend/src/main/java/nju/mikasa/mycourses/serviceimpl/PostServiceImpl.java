@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseMessage getPost(long postId) {
-        return StatusMessage.getSuccess.setData(postRepository.findById(postId).get());
+    public ResponseMessage getFollowUp(long postId) {
+        return StatusMessage.getSuccess.setData(followUpRepository.findByPost(new Post(postId)));
     }
 }

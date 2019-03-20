@@ -35,8 +35,8 @@ public class PostController {
         return postService.getPostList(Long.parseLong(params.get("courseId").toString()));
     }
 
-    @PostMapping("getPost")
-    public ResponseMessage getPost(@RequestBody Map<String, Object> params) {
-        return postService.getPost(Long.parseLong(params.get("postId").toString()));
+    @PostMapping("getFollowUp")
+    public ResponseMessage getFollowUp(@RequestBody Map<String, Object> params) {
+        return postService.getFollowUp(Long.parseLong(params.get("postId").toString()));
     }
 }

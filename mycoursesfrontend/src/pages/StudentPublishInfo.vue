@@ -11,6 +11,9 @@
           <grade-table v-if="showGradeTable"
                        v-bind:grade-data="gradeData"></grade-table>
         </el-row>
+        <el-row class="pt3">
+          <post-module v-if="postModule"></post-module>
+        </el-row>
       </el-col>
       <el-col :span="8">
         <el-card shadow="always">
@@ -19,6 +22,8 @@
             <el-button type="primary" round disabled>选课结果未公布</el-button>
           </div>
           <button-item v-if="electived&&publish.gradesFilePath!==null" v-on:click="showGrade">查看成绩</button-item>
+          <button-item v-if="!postModule" v-on:click="postModule = true;showGradeTable=false">查看论坛</button-item>
+          <button-item v-if="postModule" v-on:click="postModule = false">关闭论坛</button-item>
           <button-item v-if="electived" v-on:click="withdraw">退课</button-item>
           <button-item v-on:click="goBack()">返回</button-item>
         </el-card>
@@ -31,15 +36,17 @@
     import AssignmentList from "../components/util/AssignmentList";
     import ButtonItem from "../components/util/ButtonItem";
     import GradeTable from "../components/util/GradeTable";
+    import PostModule from "../components/util/PostModule";
     export default {
         name: "StudentPublishInfo",
-      components: {GradeTable, ButtonItem, AssignmentList, PublishInfo},
+      components: {PostModule, GradeTable, ButtonItem, AssignmentList, PublishInfo},
       data(){
         return{
           electived:false,
           notCutoff:false,
           gradeData: [],
-          showGradeTable: false
+          showGradeTable: false,
+          postModule:false
         }
       },
       beforeMount(){
@@ -81,7 +88,8 @@
           this.axios.post("/backend/withdrawCourse",{publishId:this.publish.id})
             .then(res=>{
               if (res.data.code===0){
-                this.$message.success("退课成功")
+                this.$message.success("退课成功");
+                this.$router.go(-1);
               } else {
                 this.$message.error("退课失败")
               }

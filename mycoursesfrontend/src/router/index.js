@@ -14,6 +14,14 @@ export default new Router({
       path: '/login',
       name: 'Login',
       component: () => import('../pages/Login')
+    },{
+      path: '/signUp',
+      name: 'SignUp',
+      component: () => import('../pages/SignUp')
+    },{
+      path: '/verifySuccess',
+      name: 'VerifySuccess',
+      component: () => import('../pages/VerifySuccess')
     },
     {
       path: '/',
@@ -21,6 +29,16 @@ export default new Router({
       name:"father",
       component:()=>import("../pages/FatherPage"),
       children:[
+        {
+          path:'post',
+          name:'postPage',
+          component:()=>import('../pages/PostPage')
+        },
+        {
+          path: 'userInfo',
+          name: 'UserInfo',
+          component: () => import('../pages/UserInfoPage')
+        },
         {
           path: 'student',
           name: 'student',
@@ -34,7 +52,15 @@ export default new Router({
               path:"allPublishList",
               name:"studentElectiveList",
               component:()=>import('../components/student/allPublishList')
-            },
+            },{
+              path:"withdraw",
+              name:"studentWithdraw",
+              component:()=>import('../components/student/StudentWithdraw')
+            },{
+              path:"teacherPublishList/:teacherId",
+              name:"teacherPublishList",
+              component:()=>import('../components/student/TeacherPublishList')
+            }
           ]
         },{
           path:'student/publishInfo',

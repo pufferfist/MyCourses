@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="always">
     <div slot="header" class="cf f3 tl">
-      <span>课程概览</span>
+      <span>本学期课程列表</span>
     </div>
     <publish-list v-bind:publishList="publishList"></publish-list>
   </el-card>

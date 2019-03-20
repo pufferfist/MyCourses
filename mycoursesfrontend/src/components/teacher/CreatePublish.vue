@@ -8,7 +8,7 @@
         {{course.name}}
       </el-form-item>
       <el-form-item label="学期名" class="tl">
-        2019年春
+        {{form.semester }}
       </el-form-item>
       <el-form-item label="课时数">
         <el-input
@@ -135,7 +135,7 @@
           ]},
         form: {
           courseId:"",
-          semester: "2019年春",
+          semester: "",
           classHour: "",
           classOrder: "",
           dayOfWeek: "",
@@ -148,6 +148,12 @@
         },
           labelPosition: 'left'
       }
+    },
+    beforeCreate(){
+      this.axios.post("/backend/getCurrentSemester")
+        .then(res=>{
+          this.form.semester=res.data.data;
+        })
     },
     methods: {
       onSubmit() {

@@ -8,7 +8,10 @@
         <span>{{publish.id}}</span>
       </el-form-item>
       <el-form-item label="教师姓名">
-        <span>{{publish.course.teacher.name}}</span>
+        <span v-if="this.$store.state.type==='teacher'">{{publish.course.teacher.name}}</span>
+        <router-link
+          v-if="this.$store.state.type==='student'"
+          :to="'/student/teacherPublishList/'+publish.course.teacher.id">{{publish.course.teacher.name}}</router-link>
       </el-form-item>
       <el-form-item label="开课学期">
         <span>{{publish.semester}}</span>

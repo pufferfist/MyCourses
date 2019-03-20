@@ -1,5 +1,6 @@
 package nju.mikasa.mycourses.serviceimpl;
 
+import nju.mikasa.mycourses.entity.AdminStatistic;
 import nju.mikasa.mycourses.entity.ResponseMessage;
 import nju.mikasa.mycourses.entity.StatusMessage;
 import nju.mikasa.mycourses.entity.Util;
@@ -8,10 +9,12 @@ import nju.mikasa.mycourses.entity.assignment.UploadAssignment;
 import nju.mikasa.mycourses.entity.course.*;
 import nju.mikasa.mycourses.entity.user.User;
 import nju.mikasa.mycourses.exception.RollBackException;
+import nju.mikasa.mycourses.listener.Counter;
 import nju.mikasa.mycourses.repository.*;
 import nju.mikasa.mycourses.service.CourseService;
 import nju.mikasa.mycourses.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +29,8 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private MailService mailService;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private CourseRepository courseRepository;
     @Autowired
     private PublishRepository publishRepository;
@@ -39,8 +44,9 @@ public class CourseServiceImpl implements CourseService {
     private ElectionRepository electionRepository;
     @Autowired
     private UploadAssignmentRepository uploadAssignmentRepository;
+    @Autowired
+    private SemesterRepository semesterRepository;
 
-    private static final String semester = "2019年春";
 
     @Override
     public ResponseMessage createCourse(String name, String teacherId, String description) {
@@ -60,7 +66,7 @@ public class CourseServiceImpl implements CourseService {
             return StatusMessage.usernameNotMatch;
         }
 
-        Publish publish = new Publish(course, course.getTeacher(), CourseServiceImpl.semester, classHours, classOrder, dayOfWeek, startWeek, weekNumber, classroom, maxStudentNumber,
+        Publish publish = new Publish(course, course.getTeacher(), currentSemester(), classHours, classOrder, dayOfWeek, startWeek, weekNumber, classroom, maxStudentNumber,
                 0, classNumber, null);
         publishRepository.save(publish);
         return StatusMessage.createSuccess;
@@ -231,20 +237,13 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage publishList(String teacherId) {
-        List<Publish> publishList = publishRepository.findByTeacherAndApprovedOrderByIdDesc(new User(teacherId), true);
-        return StatusMessage.getSuccess.setData(publishList);
-    }
-
-    @Override
-    public ResponseMessage publishList(String teacherId, String semester) {
-        List<Publish> publishList = publishRepository.findByTeacherAndSemesterOrderByIdDesc(new User(teacherId), semester);
-        for (int i = 0; i < publishList.size(); i++) {
-            if (!publishList.get(i).isApproved()) {
-                publishList.remove(i);
-                i--;
-            }
+//        List<Publish> publishList = publishRepository.findByTeacherAndApprovedOrderByIdDesc(new User(teacherId), true);
+//        return StatusMessage.getSuccess.setData(publishList);
+        List<Semester> semesterList = semesterRepository.findAll(new Sort(Sort.Direction.DESC, "id"));
+        for (Semester s : semesterList) {
+            s.setPublishList(publishRepository.findByTeacherAndSemesterAndApprovedOrderByIdDesc(new User(teacherId), s.getSemester(), true));
         }
-        return StatusMessage.getSuccess.setData(publishList);
+        return StatusMessage.getSuccess.setData(semesterList);
     }
 
     @Override
@@ -273,22 +272,52 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public ResponseMessage assignmentStudents(long assignmentId) {
+        List<UploadAssignment> ups = uploadAssignmentRepository.findByAssignment(new Assignment(assignmentId));
+        ArrayList<User> students = new ArrayList<>();
+        for (UploadAssignment u : ups) {
+            students.add(u.getStudent());
+        }
+        return StatusMessage.getSuccess.setData(students);
+    }
+
+    @Override
+    public ResponseMessage publishStudents(long publishId) {
+        Publish publish = publishRepository.findById(publishId).get();
+        ArrayList<User> students = new ArrayList<>();
+        if (publish.isCutOffed()) {
+            List<Election> elections = electionRepository.findByPublish(publish);
+            for (Election e : elections) {
+                if (!e.isWithdraw()) {
+                    students.add(e.getStudent());
+                }
+            }
+        } else {
+            List<UndistributedElection> elections = undistributedRepository.findByPublish(publish);
+            for (UndistributedElection e : elections) {
+                students.add(e.getStudent());
+            }
+        }
+        return StatusMessage.getSuccess.setData(students);
+    }
+
+    @Override
     public ResponseMessage electiveCourse(String studentId, long publishId) {
         Publish publish = publishRepository.findById(publishId).get();
         List<Election> elections = electionRepository.findByStudentAndPublish(new User(studentId), new Publish(publishId));
         if (elections.size() > 0) {
-            Election election=elections.get(0);
-            if(election.isWithdraw()){
+            Election election = elections.get(0);
+            if (election.isWithdraw()) {
                 if (publish.getCurrentStudentNumber() < publish.getMaxStudentNumber()) {
                     election.setWithdraw(false);
                     electionRepository.save(election);
-                    publish.setCurrentStudentNumber(publish.getCurrentStudentNumber()+1);
+                    publish.setCurrentStudentNumber(publish.getCurrentStudentNumber() + 1);
                     publishRepository.save(publish);
                     return StatusMessage.electiveSuccess;
                 } else {
                     return StatusMessage.reachLimit;
                 }
-            }else {
+            } else {
                 return StatusMessage.alreadyElectived;
             }
         }
@@ -299,7 +328,7 @@ public class CourseServiceImpl implements CourseService {
         } else if (publish.getCurrentStudentNumber() < publish.getMaxStudentNumber()) {
             Election election = new Election(new Publish(publishId), new User(studentId), false);
             electionRepository.save(election);
-            publish.setCurrentStudentNumber(publish.getCurrentStudentNumber()+1);
+            publish.setCurrentStudentNumber(publish.getCurrentStudentNumber() + 1);
             publishRepository.save(publish);
             return StatusMessage.electiveSuccess;
         } else {
@@ -316,8 +345,8 @@ public class CourseServiceImpl implements CourseService {
         Election election = elections.get(0);
         election.setWithdraw(true);
         electionRepository.save(election);
-        Publish publish=publishRepository.findById(publishId).get();
-        publish.setCurrentStudentNumber(publish.getCurrentStudentNumber()-1);
+        Publish publish = publishRepository.findById(publishId).get();
+        publish.setCurrentStudentNumber(publish.getCurrentStudentNumber() - 1);
         publishRepository.save(publish);
         return StatusMessage.withdrawSuccess;
     }
@@ -344,7 +373,12 @@ public class CourseServiceImpl implements CourseService {
             if (directFile.isFile() && directFile.exists()) {
                 directFile.delete();
             }
+            String filename = studentId.substring(0, studentId.indexOf("@")) + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
+            filePath = filePath.substring(0, filePath.lastIndexOf("/") + 1) + filename;
             Util.saveFile(file, filePath);
+            UploadAssignment assignment = opt.get();
+            assignment.setFilePath(filePath);
+            uploadAssignmentRepository.save(assignment);
         } else {
             Assignment assignment = assignmentRepository.findById(assignmentId).get();
             Publish publish = assignment.getPublish();
@@ -355,7 +389,7 @@ public class CourseServiceImpl implements CourseService {
                 return StatusMessage.notElectived;
             }
 
-            String filename = studentId + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
+            String filename = studentId.substring(0, studentId.indexOf("@")) + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
             String filePath = Util.getStaticPath() + "/" + course.getId() + "/publish/" + publish.getSemester() + publish.getClassNumber() + "班/" +
                     assignment.getId() + "/uploads/" + filename;
             Util.saveFile(file, filePath);
@@ -368,11 +402,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public ResponseMessage getUploadedAssignment(String studentId, long assignmentId){
-        Optional<UploadAssignment> opt=uploadAssignmentRepository.findByStudentAndAssignment(new User(studentId), new Assignment(assignmentId));
-        if (opt.isPresent()){
+    public ResponseMessage getUploadedAssignment(String studentId, long assignmentId) {
+        Optional<UploadAssignment> opt = uploadAssignmentRepository.findByStudentAndAssignment(new User(studentId), new Assignment(assignmentId));
+        if (opt.isPresent()) {
             return StatusMessage.getSuccess.setData(opt.get());
-        }else{
+        } else {
             return StatusMessage.notExist;
         }
     }
@@ -380,18 +414,25 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public ResponseMessage electivedCourseList(String studentId) {
         List<Election> electionList = electionRepository.findByStudent(new User(studentId));
-        ArrayList<Publish> publishList = new ArrayList<>();
-        for (Election e : electionList) {
-            if(e.isWithdraw())
-                continue;
-            publishList.add(e.getPublish());
+        List<Semester> semesterList = semesterRepository.findAll(new Sort(Sort.Direction.DESC, "id"));
+        for (Semester s : semesterList) {
+            s.setPublishList(new ArrayList<>());
         }
-        return StatusMessage.getSuccess.setData(publishList);
+        for (Election e : electionList) {
+            if (e.isWithdraw())
+                continue;
+            for (Semester s : semesterList) {
+                if (s.getSemester().equals(e.getPublish().getSemester())) {
+                    s.getPublishList().add(e.getPublish());
+                }
+            }
+        }
+        return StatusMessage.getSuccess.setData(semesterList);
     }
 
     @Override
     public ResponseMessage allPublishList(String studentId) {
-        List<Publish> publishList = publishRepository.findBySemesterOrderByIdDesc(semester);
+        List<Publish> publishList = publishRepository.findBySemesterOrderByIdDesc(currentSemester());
         return StatusMessage.getSuccess.setData(publishList);
     }
 
@@ -404,12 +445,11 @@ public class CourseServiceImpl implements CourseService {
         else if (undistributedElections.size() == 1 && elections.size() == 0)
             return StatusMessage.notCutOffed;
         else if (undistributedElections.size() == 0 && elections.size() == 1) {
-            if (elections.get(0).isWithdraw()){
+            if (elections.get(0).isWithdraw()) {
                 return StatusMessage.notElectived;
             }
             return StatusMessage.electived;
-        }
-        else
+        } else
             return StatusMessage.fail;
     }
 
@@ -423,6 +463,44 @@ public class CourseServiceImpl implements CourseService {
     public String getCourseGrade(String studentId, long publishId) {
         Publish publish = publishRepository.findById(publishId).get();
         return publish.getGradesFilePath();
+    }
+
+    @Override
+    public ResponseMessage withDrawCourseList(String studentId) {
+        List<Election> electionList = electionRepository.findByStudent(new User(studentId));
+        List<Semester> semesterList = semesterRepository.findAll(new Sort(Sort.Direction.DESC, "id"));
+        for (Semester s : semesterList) {
+            s.setPublishList(new ArrayList<>());
+        }
+        for (Election e : electionList) {
+            if (!e.isWithdraw())
+                continue;
+            for (Semester s : semesterList) {
+                if (s.getSemester().equals(e.getPublish().getSemester())) {
+                    s.getPublishList().add(e.getPublish());
+                }
+            }
+        }
+        return StatusMessage.getSuccess.setData(semesterList);
+    }
+
+    @Override
+    public ResponseMessage teacherPublishList(String studentId, String teacherId) {
+        List<Election> electionList = electionRepository.findByStudent(new User(studentId));
+        List<Semester> semesterList = semesterRepository.findAll(new Sort(Sort.Direction.DESC, "id"));
+        for (Semester s : semesterList) {
+            s.setPublishList(new ArrayList<>());
+        }
+        for (Election e : electionList) {
+            if (e.isWithdraw() || !e.getPublish().getCourse().getTeacher().getId().equals(teacherId))
+                continue;
+            for (Semester s : semesterList) {
+                if (s.getSemester().equals(e.getPublish().getSemester())) {
+                    s.getPublishList().add(e.getPublish());
+                }
+            }
+        }
+        return StatusMessage.getSuccess.setData(semesterList);
     }
 
     @Override
@@ -443,8 +521,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public ResponseMessage cutOffElection(long publishId) {
-        Publish publish=publishRepository.findById(publishId).get();
-        if (publish.isCutOffed()){
+        Publish publish = publishRepository.findById(publishId).get();
+        if (publish.isCutOffed()) {
             return StatusMessage.fail;
         }
         List<UndistributedElection> undistributedElectionList = undistributedRepository.findByPublish(publish);
@@ -488,5 +566,46 @@ public class CourseServiceImpl implements CourseService {
         return StatusMessage.getSuccess.setData(publishRepository.findByApprovedAndCutOffed(true, false));
     }
 
+    @Override
+    public ResponseMessage newSemester(String semester) {
+        Semester current = semesterRepository.currentSemester();
+        String currentSem = current.getSemester();
+        int year = Integer.parseInt(currentSem.substring(0, 4));
+        String season = currentSem.substring(5, 6);
+        int nextYear = Integer.parseInt(semester.substring(0, 4));
+        String nextSeason = semester.substring(5, 6);
+        if (season.equals("春")) {
+            if (nextYear != year || !nextSeason.equals("秋")) {
+                return StatusMessage.fail;
+            }
+        } else if (season.equals("秋")) {
+            if (nextYear != year + 1 || !nextSeason.equals("春")) {
+                return StatusMessage.fail;
+            }
+        }
+        semesterRepository.save(new Semester(semester));
+        return StatusMessage.createSuccess;
+    }
 
+    @Override
+    public ResponseMessage getCurrentSemester() {
+        return StatusMessage.getSuccess.setData(currentSemester());
+    }
+
+    @Override
+    public ResponseMessage getStatistic() {
+        int teacherNum = userRepository.teacherCount();
+        int studentNum = userRepository.studentCount();
+        int courseNum = userRepository.courseCount();
+        int publishNum = userRepository.publishCount();
+        Counter counter = Counter.getInstance();
+        AdminStatistic statistic = new AdminStatistic(teacherNum, studentNum, counter.getTeacherNum(),
+                counter.getStudentNum(), counter.getHistoryVisitNum(),
+                courseNum, publishNum, currentSemester());
+        return StatusMessage.getSuccess.setData(statistic);
+    }
+
+    private String currentSemester() {
+        return semesterRepository.currentSemester().getSemester();
+    }
 }
