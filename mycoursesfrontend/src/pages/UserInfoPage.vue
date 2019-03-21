@@ -76,7 +76,7 @@
           .then(res=>{
             if (res.data.code === 0) {
               this.$message.success("修改成功");
-              this.axios.post("/backend/user/info")
+              this.axios.post("/backend/user/info",{username:this.user.id})
                 .then(res=>{
                   if(res.data.code===0){
                     this.$store.commit("set",{type:"user",data:res.data.data})

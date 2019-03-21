@@ -60,6 +60,13 @@ public class MycoursesApplicationTests {
     }
 
     @Test
+    public void addTeacher() {
+        userRepository.save(new User("T2345678", "老师A",
+                "T2345678@nju.edu.cn", new Sha256Hash("123456").toString(),
+                null, Type.TEACHER, false, "123456", Calendar.getInstance(), true));
+    }
+
+    @Test
     public void getBack() {
         User user = userRepository.findById("161250146@smail.nju.edu.cn").get();
         user.setDeleted(false);

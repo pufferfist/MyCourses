@@ -79,6 +79,8 @@
                 this.$Message.error("密码错误")
               }else if (response.data.code === 2001) {
                 this.$Message.error("用户已注销")
+              } else if (response.data.code === 1006) {
+                this.$Message.error("帐号未激活")
               }
             })
             .catch(function (error) {
